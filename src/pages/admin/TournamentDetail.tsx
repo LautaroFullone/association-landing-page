@@ -52,7 +52,7 @@ export function TournamentDetail() {
 
   // Mock tournament info fetching based on ID
   const tournamentName =
-    id === "1" ? "Gran Abierto de Verano" : "Torneo Details";
+    id === "1" ? "Gran Abierto de Verano" : "Detalle del Torneo";
 
   const filteredEnrolled = enrolled.filter(
     (pair) =>

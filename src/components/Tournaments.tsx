@@ -414,7 +414,8 @@ export function Tournaments() {
           <div className="relative w-full max-w-md bg-slate-900 border border-white/10 rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300 max-h-[90vh] flex flex-col">
             <button
               onClick={closeModal}
-              className="absolute top-6 right-6 p-2 rounded-full bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors z-10"
+              className="cursor-pointer absolute top-6 right-6 p-2 rounded-full bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors z-50"
+              aria-label="Cerrar modal"
             >
               <X className="w-5 h-5" />
             </button>
