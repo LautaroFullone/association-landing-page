@@ -1,128 +1,316 @@
-import { Users, FileText, Trophy, DollarSign } from "lucide-react";
+import {
+  Users,
+  FileText,
+  Trophy,
+  ChevronRight,
+  Clock,
+  UserPlus,
+  ClipboardList,
+  Calendar,
+  CheckCircle,
+  AlertCircle,
+} from "lucide-react";
 
 export function Dashboard() {
   const stats = [
     {
       name: "Solicitudes Pendientes",
       value: "12",
+      subtitle: "3 pendientes",
       icon: FileText,
-      change: "+2 hoy",
-      color: "bg-blue-500",
+      iconBg: "bg-blue-500/20",
+      iconColor: "text-blue-400",
     },
     {
-      name: "Inscriptos Totales",
+      name: "Socios Activos",
       value: "156",
+      subtitle: "+8 este mes",
       icon: Users,
-      change: "+12% mes",
-      color: "bg-green-500",
+      iconBg: "bg-green-500/20",
+      iconColor: "text-green-400",
     },
     {
       name: "Torneos Activos",
       value: "3",
+      subtitle: "2 próximamente",
       icon: Trophy,
-      change: "En curso",
-      color: "bg-purple-500",
+      iconBg: "bg-purple-500/20",
+      iconColor: "text-purple-400",
+    },
+  ];
+
+  const recentActivity = [
+    {
+      id: 1,
+      icon: UserPlus,
+      iconBg: "bg-blue-500/20",
+      iconColor: "text-blue-400",
+      title: "Nueva solicitud de socio",
+      subtitle: "Juan Pérez solicitó ser socio",
+      time: "Hace 2 horas",
     },
     {
-      name: "Ingresos Mes",
-      value: "$450k",
-      icon: DollarSign,
-      change: "+8% vs mes anterior",
-      color: "bg-yellow-500",
+      id: 2,
+      icon: CheckCircle,
+      iconBg: "bg-green-500/20",
+      iconColor: "text-green-400",
+      title: "Inscripción confirmada",
+      subtitle: "María García - Torneo Apertura",
+      time: "Hace 5 horas",
+    },
+    {
+      id: 3,
+      icon: AlertCircle,
+      iconBg: "bg-amber-500/20",
+      iconColor: "text-amber-400",
+      title: "Solicitud pendiente",
+      subtitle: "Carlos López - Esperando aprobación",
+      time: "Hace 1 día",
+    },
+    {
+      id: 4,
+      icon: Trophy,
+      iconBg: "bg-purple-500/20",
+      iconColor: "text-purple-400",
+      title: "Torneo actualizado",
+      subtitle: "Gran Abierto de Verano - 32 parejas",
+      time: "Hace 2 días",
+    },
+  ];
+
+  const quickActions = [
+    {
+      id: 1,
+      icon: UserPlus,
+      iconBg: "bg-blue-500/20",
+      iconColor: "text-blue-400",
+      title: "Nueva Solicitud",
+      subtitle: "Registrar nuevo socio",
+      href: "/admin/membership-requests",
+    },
+    {
+      id: 2,
+      icon: Calendar,
+      iconBg: "bg-purple-500/20",
+      iconColor: "text-purple-400",
+      title: "Nuevo Torneo",
+      subtitle: "Crear torneo",
+      href: "/admin/tournaments/new",
+    },
+    {
+      id: 3,
+      icon: ClipboardList,
+      iconBg: "bg-green-500/20",
+      iconColor: "text-green-400",
+      title: "Ver Solicitudes",
+      subtitle: "Gestionar solicitudes",
+      href: "/admin/membership-requests",
+    },
+    {
+      id: 4,
+      icon: Trophy,
+      iconBg: "bg-amber-500/20",
+      iconColor: "text-amber-400",
+      title: "Ver Torneos",
+      subtitle: "Gestionar torneos",
+      href: "/admin/tournaments",
     },
   ];
 
   return (
-    <div>
-      <h2 className="text-2xl font-bold text-slate-800 mb-6">Dashboard</h2>
+    <div className="space-y-8">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl md:text-3xl font-bold text-white">
+          Panel de Control
+        </h1>
+        <p className="text-slate-400 mt-1">Resumen general de la plataforma</p>
+      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         {stats.map((stat) => (
           <div
             key={stat.name}
-            className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm"
+            className="bg-slate-800/50 backdrop-blur-sm p-5 md:p-6 rounded-2xl border border-white/5 hover:border-white/10 transition-all group"
           >
-            <div className="flex items-center justify-between mb-4">
-              <div
-                className={`p-2 rounded-lg ${stat.color} bg-opacity-10 text-${stat.color.split("-")[1]}-600`}
-              >
-                <stat.icon className="w-6 h-6" />
+            <div className="flex items-center justify-between">
+              <div className="space-y-3">
+                <p className="text-slate-400 text-sm font-medium">
+                  {stat.name}
+                </p>
+                <p className="text-3xl md:text-4xl font-bold text-white">
+                  {stat.value}
+                </p>
+                <p className="text-slate-500 text-sm">{stat.subtitle}</p>
               </div>
-              <span className="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">
-                {stat.change}
-              </span>
+              <div
+                className={`p-3 md:p-4 rounded-xl ${stat.iconBg} ${stat.iconColor}`}
+              >
+                <stat.icon className="w-6 h-6 md:w-7 md:h-7" />
+              </div>
             </div>
-
-            <h3 className="text-slate-500 text-sm font-medium">{stat.name}</h3>
-            <p className="text-2xl font-bold text-slate-900 mt-1">
-              {stat.value}
-            </p>
           </div>
         ))}
       </div>
 
-      <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-          <h3 className="font-bold text-slate-800 mb-4">
-            Inscripciones Recientes
-          </h3>
+      {/* Activity & Quick Actions Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
+        {/* Recent Activity */}
+        <div className="bg-slate-800/50 backdrop-blur-sm p-5 md:p-6 rounded-2xl border border-white/5">
+          <div className="flex items-center gap-2 mb-6">
+            <Clock className="w-5 h-5 text-blue-400" />
+            <h3 className="text-lg font-bold text-white">Actividad Reciente</h3>
+          </div>
+          <p className="text-slate-500 text-sm -mt-4 mb-6">
+            Últimas acciones en el panel
+          </p>
+
           <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
+            {recentActivity.map((activity) => (
               <div
-                key={i}
-                className="flex items-center justify-between p-3 bg-slate-50 rounded-lg"
+                key={activity.id}
+                className="flex items-start gap-4 p-3 rounded-xl bg-slate-900/50 hover:bg-slate-900 transition-colors"
               >
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold">
-                    JP
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-slate-900">
-                      Juan Pérez
-                    </p>
-                    <p className="text-xs text-slate-500">
-                      Torneo Apertura 2026
-                    </p>
-                  </div>
+                <div
+                  className={`p-2 rounded-lg ${activity.iconBg} ${activity.iconColor} shrink-0`}
+                >
+                  <activity.icon className="w-4 h-4" />
                 </div>
-                <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded">
-                  Pendiente
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-white truncate">
+                    {activity.title}
+                  </p>
+                  <p className="text-xs text-slate-500 mt-0.5 truncate">
+                    {activity.subtitle}
+                  </p>
+                </div>
+                <span className="text-xs text-slate-600 shrink-0">
+                  {activity.time}
                 </span>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-          <h3 className="font-bold text-slate-800 mb-4">Estado de Torneos</h3>
-          <div className="space-y-4">
-            {/* Mock Content */}
-            <div className="p-3 border border-slate-100 rounded-lg">
-              <div className="flex justify-between items-center mb-2">
-                <span className="font-medium text-slate-900">
-                  Apertura 2026
-                </span>
-                <span className="text-xs text-slate-500">80% Lleno</span>
-              </div>
-              <div className="w-full bg-slate-100 rounded-full h-2">
+        {/* Quick Actions */}
+        <div className="bg-slate-800/50 backdrop-blur-sm p-5 md:p-6 rounded-2xl border border-white/5">
+          <div className="flex items-center gap-2 mb-6">
+            <ChevronRight className="w-5 h-5 text-purple-400" />
+            <h3 className="text-lg font-bold text-white">Acciones Rápidas</h3>
+          </div>
+          <p className="text-slate-500 text-sm -mt-4 mb-6">Tareas frecuentes</p>
+
+          <div className="space-y-3">
+            {quickActions.map((action) => (
+              <a
+                key={action.id}
+                href={action.href}
+                className="flex items-center gap-4 p-3 rounded-xl bg-slate-900/50 hover:bg-slate-900 transition-colors group cursor-pointer"
+              >
                 <div
-                  className="bg-blue-600 h-2 rounded-full"
-                  style={{ width: "80%" }}
-                ></div>
+                  className={`p-2 rounded-lg ${action.iconBg} ${action.iconColor} shrink-0`}
+                >
+                  <action.icon className="w-4 h-4" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-white">
+                    {action.title}
+                  </p>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    {action.subtitle}
+                  </p>
+                </div>
+                <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-slate-400 group-hover:translate-x-0.5 transition-all shrink-0" />
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Tournament Status */}
+      <div className="bg-slate-800/50 backdrop-blur-sm p-5 md:p-6 rounded-2xl border border-white/5">
+        <div className="flex items-center gap-2 mb-6">
+          <Trophy className="w-5 h-5 text-purple-400" />
+          <h3 className="text-lg font-bold text-white">Estado de Torneos</h3>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Tournament 1 */}
+          <div className="p-4 rounded-xl bg-slate-900/50 border border-white/5">
+            <div className="flex justify-between items-start mb-3">
+              <div>
+                <p className="font-medium text-white">Gran Abierto de Verano</p>
+                <p className="text-xs text-slate-500 mt-1">15 - 17 Feb 2026</p>
+              </div>
+              <span className="text-xs font-medium text-green-400 bg-green-500/10 px-2 py-1 rounded-full">
+                Abierto
+              </span>
+            </div>
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-slate-400">Inscripciones</span>
+                <span className="text-white font-medium">26/32 parejas</span>
+              </div>
+              <div className="w-full bg-slate-700 rounded-full h-2">
+                <div
+                  className="bg-gradient-to-r from-blue-500 to-blue-400 h-2 rounded-full transition-all"
+                  style={{ width: "81%" }}
+                />
               </div>
             </div>
-            <div className="p-3 border border-slate-100 rounded-lg">
-              <div className="flex justify-between items-center mb-2">
-                <span className="font-medium text-slate-900">
-                  Master Fin de Año
-                </span>
-                <span className="text-xs text-slate-500">45% Lleno</span>
+          </div>
+
+          {/* Tournament 2 */}
+          <div className="p-4 rounded-xl bg-slate-900/50 border border-white/5">
+            <div className="flex justify-between items-start mb-3">
+              <div>
+                <p className="font-medium text-white">
+                  Copa Ciudad de Mar del Plata
+                </p>
+                <p className="text-xs text-slate-500 mt-1">1 - 3 Mar 2026</p>
               </div>
-              <div className="w-full bg-slate-100 rounded-full h-2">
+              <span className="text-xs font-medium text-blue-400 bg-blue-500/10 px-2 py-1 rounded-full">
+                Próximamente
+              </span>
+            </div>
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-slate-400">Inscripciones</span>
+                <span className="text-white font-medium">12/24 parejas</span>
+              </div>
+              <div className="w-full bg-slate-700 rounded-full h-2">
                 <div
-                  className="bg-purple-600 h-2 rounded-full"
-                  style={{ width: "45%" }}
-                ></div>
+                  className="bg-gradient-to-r from-purple-500 to-purple-400 h-2 rounded-full transition-all"
+                  style={{ width: "50%" }}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Tournament 3 */}
+          <div className="p-4 rounded-xl bg-slate-900/50 border border-white/5">
+            <div className="flex justify-between items-start mb-3">
+              <div>
+                <p className="font-medium text-white">
+                  Master de Maestros 2025
+                </p>
+                <p className="text-xs text-slate-500 mt-1">10 - 15 Dic 2025</p>
+              </div>
+              <span className="text-xs font-medium text-slate-400 bg-slate-500/10 px-2 py-1 rounded-full">
+                Finalizado
+              </span>
+            </div>
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-slate-400">Inscripciones</span>
+                <span className="text-white font-medium">16/16 parejas</span>
+              </div>
+              <div className="w-full bg-slate-700 rounded-full h-2">
+                <div
+                  className="bg-gradient-to-r from-slate-500 to-slate-400 h-2 rounded-full transition-all"
+                  style={{ width: "100%" }}
+                />
               </div>
             </div>
           </div>
