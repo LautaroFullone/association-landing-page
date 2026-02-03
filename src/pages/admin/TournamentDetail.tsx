@@ -47,7 +47,7 @@ const MOCK_ENROLLED: EnrolledPair[] = [
 
 export function TournamentDetail() {
   const { id } = useParams();
-  const [enrolled, setEnrolled] = useState<EnrolledPair[]>(MOCK_ENROLLED);
+  const [enrolled] = useState<EnrolledPair[]>(MOCK_ENROLLED);
   const [searchTerm, setSearchTerm] = useState("");
 
   // Mock tournament info fetching based on ID
