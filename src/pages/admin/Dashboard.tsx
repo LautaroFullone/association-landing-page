@@ -86,7 +86,7 @@ export function Dashboard() {
       iconColor: "text-blue-400",
       title: "Nueva Solicitud",
       subtitle: "Registrar nuevo socio",
-      href: "/admin/membership-requests",
+      href: "/admin/requests",
     },
     {
       id: 2,
@@ -104,7 +104,7 @@ export function Dashboard() {
       iconColor: "text-green-400",
       title: "Ver Solicitudes",
       subtitle: "Gestionar solicitudes",
-      href: "/admin/membership-requests",
+      href: "/admin/requests",
     },
     {
       id: 4,

@@ -10,6 +10,7 @@ import {
   Edit,
   Trophy,
 } from "lucide-react";
+import { ConfirmActionModal } from "@/components/ConfirmActionModal";
 
 interface Tournament {
   id: number;
@@ -58,10 +59,15 @@ const MOCK_TOURNAMENTS: Tournament[] = [
 export function TournamentsList() {
   const [tournaments, setTournaments] =
     useState<Tournament[]>(MOCK_TOURNAMENTS);
+  const [tournamentToDelete, setTournamentToDelete] =
+    useState<Tournament | null>(null);
 
-  const handleDelete = (id: number) => {
-    if (confirm("¿Estás seguro de eliminar este torneo?")) {
-      setTournaments((prev) => prev.filter((t) => t.id !== id));
+  const confirmDelete = () => {
+    if (tournamentToDelete) {
+      setTournaments((prev) =>
+        prev.filter((t) => t.id !== tournamentToDelete.id),
+      );
+      setTournamentToDelete(null);
     }
   };
 
@@ -108,12 +114,12 @@ export function TournamentsList() {
                   {tournament.status}
                 </span>
                 <div className="flex gap-1">
-                  <button className="p-1.5 hover:bg-slate-800 rounded text-slate-400 hover:text-white transition-colors">
+                  <button className="p-1.5 hover:bg-slate-800 rounded text-slate-400 hover:text-white transition-colors cursor-pointer">
                     <Edit className="w-4 h-4" />
                   </button>
                   <button
-                    onClick={() => handleDelete(tournament.id)}
-                    className="p-1.5 hover:bg-red-500/10 rounded text-slate-400 hover:text-red-400 transition-colors"
+                    onClick={() => setTournamentToDelete(tournament)}
+                    className="p-1.5 hover:bg-red-500/10 rounded text-slate-400 hover:text-red-400 transition-colors cursor-pointer"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -146,7 +152,7 @@ export function TournamentsList() {
               <div className="flex items-center gap-2 text-sm text-slate-300">
                 <Users className="w-4 h-4" />
                 <span className="font-medium">
-                  {tournament.enrolledCount} Inscriptos
+                  {tournament.enrolledCount} Parejas Confirmadas
                 </span>
               </div>
               <Link
@@ -159,6 +165,31 @@ export function TournamentsList() {
           </div>
         ))}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {tournamentToDelete && (
+        <ConfirmActionModal
+          isOpen={!!tournamentToDelete}
+          title={
+            <>
+              ¿Estás seguro que querés eliminar el torneo{" "}
+              <span className="font-bold">{tournamentToDelete.name}</span>?
+            </>
+          }
+          description="Se eliminará permanentemente el torneo y todas sus inscripciones. Esta acción no se puede deshacer."
+          confirmButton={{
+            icon: Trash2,
+            label: "Eliminar torneo",
+            variant: "destructive",
+            onConfirm: confirmDelete,
+          }}
+          cancelButton={{
+            label: "No, mantener",
+            variant: "outline",
+            onCancel: () => setTournamentToDelete(null),
+          }}
+        />
+      )}
     </div>
   );
 }
