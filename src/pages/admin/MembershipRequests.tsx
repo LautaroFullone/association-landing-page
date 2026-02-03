@@ -18,6 +18,9 @@ import {
   ChevronLeft,
   ChevronRight,
   RotateCcw,
+  UserPlus,
+  Loader2,
+  Save,
 } from "lucide-react";
 import {
   Select,
@@ -29,6 +32,36 @@ import {
 import { ConfirmActionModal } from "@/components/ConfirmActionModal";
 import type { MembershipRequest } from "@/model/MembershipRequest.model";
 import { MOCK_REQUESTS } from "@/mock/membershipRequests.mock";
+
+interface NewMemberFormData {
+  nombre: string;
+  dni: string;
+  fechaNacimiento: string;
+  localidad: string;
+  direccion: string;
+  telefono: string;
+  email: string;
+  instagram: string;
+  categoria: string;
+  prenda: string;
+  talle: string;
+  fechaAltaOriginal: string;
+}
+
+const INITIAL_FORM_DATA: NewMemberFormData = {
+  nombre: "",
+  dni: "",
+  fechaNacimiento: "",
+  localidad: "Mar del Plata",
+  direccion: "",
+  telefono: "",
+  email: "",
+  instagram: "",
+  categoria: "",
+  prenda: "",
+  talle: "",
+  fechaAltaOriginal: "",
+};
 
 export function MembershipRequests() {
   const [requests, setRequests] = useState<MembershipRequest[]>(MOCK_REQUESTS);
@@ -46,6 +79,12 @@ export function MembershipRequests() {
     useState<MembershipRequest | null>(null);
   const [requestToDelete, setRequestToDelete] =
     useState<MembershipRequest | null>(null);
+
+  // New Member Modal State
+  const [isNewMemberModalOpen, setIsNewMemberModalOpen] = useState(false);
+  const [isSubmittingNewMember, setIsSubmittingNewMember] = useState(false);
+  const [newMemberForm, setNewMemberForm] =
+    useState<NewMemberFormData>(INITIAL_FORM_DATA);
 
   const confirmDelete = () => {
     if (requestToDelete) {
@@ -92,6 +131,55 @@ export function MembershipRequests() {
     setCurrentPage(1);
   };
 
+  const handleNewMemberInputChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const { name, value } = e.target;
+    setNewMemberForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleNewMemberSelectChange = (name: string, value: string) => {
+    setNewMemberForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleNewMemberSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmittingNewMember(true);
+
+    // Simulate API call
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // Create new member as approved
+    const newMember: MembershipRequest = {
+      id: `manual-${Date.now()}`,
+      nombre: newMemberForm.nombre,
+      dni: newMemberForm.dni,
+      fechaNacimiento: newMemberForm.fechaNacimiento,
+      localidad: newMemberForm.localidad,
+      direccion: newMemberForm.direccion,
+      telefono: newMemberForm.telefono,
+      email: newMemberForm.email,
+      instagram: newMemberForm.instagram,
+      categoria: newMemberForm.categoria,
+      prenda: newMemberForm.prenda,
+      talle: newMemberForm.talle,
+      fechaSolicitud:
+        newMemberForm.fechaAltaOriginal ||
+        new Date().toLocaleDateString("es-AR"),
+      estado: "aprobado",
+    };
+
+    setRequests((prev) => [newMember, ...prev]);
+    setIsSubmittingNewMember(false);
+    setIsNewMemberModalOpen(false);
+    setNewMemberForm(INITIAL_FORM_DATA);
+  };
+
+  const closeNewMemberModal = () => {
+    setIsNewMemberModalOpen(false);
+    setNewMemberForm(INITIAL_FORM_DATA);
+  };
+
   return (
     <div className="animate-in fade-in duration-500 relative">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
@@ -103,10 +191,19 @@ export function MembershipRequests() {
             Gestiona las nuevas solicitudes de alta
           </p>
         </div>
-        <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-lg shadow-blue-600/20">
-          <Download className="w-4 h-4" />
-          Exportar Lista
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setIsNewMemberModalOpen(true)}
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-lg shadow-green-600/20 cursor-pointer"
+          >
+            <UserPlus className="w-4 h-4" />
+            Nuevo Socio
+          </button>
+          <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-lg shadow-blue-600/20 cursor-pointer">
+            <Download className="w-4 h-4" />
+            Exportar Lista
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -347,6 +444,345 @@ export function MembershipRequests() {
           </div>
         </div>
       </div>
+
+      {/* New Member Modal */}
+      {isNewMemberModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm"
+            onClick={closeNewMemberModal}
+          />
+          <div className="relative w-full max-w-2xl bg-slate-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in duration-300 max-h-[90vh] flex flex-col">
+            {/* Header */}
+            <div className="p-6 border-b border-white/5 flex items-center justify-between sticky top-0 bg-slate-900 z-10">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-green-500/10">
+                  <UserPlus className="w-5 h-5 text-green-400" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-white">
+                    Agregar Socio Manualmente
+                  </h2>
+                  <p className="text-slate-400 text-sm">
+                    Carga un socio existente al sistema
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={closeNewMemberModal}
+                className="p-2 hover:bg-white/5 rounded-full text-slate-400 hover:text-white transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Form */}
+            <form
+              onSubmit={handleNewMemberSubmit}
+              className="p-6 overflow-y-auto custom-scrollbar space-y-6"
+            >
+              {/* Personal Data */}
+              <div>
+                <h3 className="text-sm font-semibold text-blue-400 uppercase tracking-wider mb-4">
+                  Datos Personales
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-1.5">
+                      Nombre y Apellido *
+                    </label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                      <input
+                        type="text"
+                        name="nombre"
+                        required
+                        value={newMemberForm.nombre}
+                        onChange={handleNewMemberInputChange}
+                        placeholder="Juan Pérez"
+                        className="w-full bg-slate-950 border border-white/10 rounded-lg pl-10 pr-4 py-2.5 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-1.5">
+                      DNI *
+                    </label>
+                    <div className="relative">
+                      <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                      <input
+                        type="text"
+                        name="dni"
+                        required
+                        value={newMemberForm.dni}
+                        onChange={handleNewMemberInputChange}
+                        placeholder="12345678"
+                        className="w-full bg-slate-950 border border-white/10 rounded-lg pl-10 pr-4 py-2.5 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-1.5">
+                      Fecha de Nacimiento *
+                    </label>
+                    <div className="relative">
+                      <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                      <input
+                        type="date"
+                        name="fechaNacimiento"
+                        required
+                        value={newMemberForm.fechaNacimiento}
+                        onChange={handleNewMemberInputChange}
+                        className="w-full bg-slate-950 border border-white/10 rounded-lg pl-10 pr-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-1.5">
+                      Teléfono *
+                    </label>
+                    <div className="relative">
+                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                      <input
+                        type="tel"
+                        name="telefono"
+                        required
+                        value={newMemberForm.telefono}
+                        onChange={handleNewMemberInputChange}
+                        placeholder="223 123 4567"
+                        className="w-full bg-slate-950 border border-white/10 rounded-lg pl-10 pr-4 py-2.5 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-1.5">
+                      Email *
+                    </label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                      <input
+                        type="email"
+                        name="email"
+                        required
+                        value={newMemberForm.email}
+                        onChange={handleNewMemberInputChange}
+                        placeholder="email@ejemplo.com"
+                        className="w-full bg-slate-950 border border-white/10 rounded-lg pl-10 pr-4 py-2.5 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-1.5">
+                      Instagram
+                    </label>
+                    <input
+                      type="text"
+                      name="instagram"
+                      value={newMemberForm.instagram}
+                      onChange={handleNewMemberInputChange}
+                      placeholder="@usuario"
+                      className="w-full bg-slate-950 border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-1.5">
+                      Dirección *
+                    </label>
+                    <div className="relative">
+                      <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                      <input
+                        type="text"
+                        name="direccion"
+                        required
+                        value={newMemberForm.direccion}
+                        onChange={handleNewMemberInputChange}
+                        placeholder="Calle 123"
+                        className="w-full bg-slate-950 border border-white/10 rounded-lg pl-10 pr-4 py-2.5 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-1.5">
+                      Localidad *
+                    </label>
+                    <input
+                      type="text"
+                      name="localidad"
+                      required
+                      value={newMemberForm.localidad}
+                      onChange={handleNewMemberInputChange}
+                      placeholder="Mar del Plata"
+                      className="w-full bg-slate-950 border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Subscription Data */}
+              <div>
+                <h3 className="text-sm font-semibold text-blue-400 uppercase tracking-wider mb-4">
+                  Datos de Suscripción
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-1.5">
+                      Categoría *
+                    </label>
+                    <Select
+                      value={newMemberForm.categoria}
+                      onValueChange={(value) =>
+                        handleNewMemberSelectChange("categoria", value)
+                      }
+                    >
+                      <SelectTrigger className="w-full bg-slate-950 border-white/10 text-white">
+                        <SelectValue placeholder="Seleccionar" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-slate-900 border-white/10">
+                        {["1ra", "2da", "3ra", "4ta", "5ta", "6ta", "7ma"].map(
+                          (cat) => (
+                            <SelectItem
+                              key={cat}
+                              value={cat}
+                              className="text-white focus:bg-slate-800 focus:text-white"
+                            >
+                              {cat} Categoría
+                            </SelectItem>
+                          ),
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-1.5">
+                      Fecha de Alta Original
+                    </label>
+                    <input
+                      type="date"
+                      name="fechaAltaOriginal"
+                      value={newMemberForm.fechaAltaOriginal}
+                      onChange={handleNewMemberInputChange}
+                      className="w-full bg-slate-950 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+                    />
+                    <p className="text-xs text-slate-500 mt-1">
+                      Fecha en que el socio se dio de alta originalmente
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-1.5">
+                      Prenda de Regalo
+                    </label>
+                    <Select
+                      value={newMemberForm.prenda}
+                      onValueChange={(value) =>
+                        handleNewMemberSelectChange("prenda", value)
+                      }
+                    >
+                      <SelectTrigger className="w-full bg-slate-950 border-white/10 text-white">
+                        <SelectValue placeholder="Seleccionar" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-slate-900 border-white/10">
+                        <SelectItem
+                          value="remera"
+                          className="text-white focus:bg-slate-800 focus:text-white"
+                        >
+                          Remera
+                        </SelectItem>
+                        <SelectItem
+                          value="musculosa"
+                          className="text-white focus:bg-slate-800 focus:text-white"
+                        >
+                          Musculosa
+                        </SelectItem>
+                        <SelectItem
+                          value="ninguna"
+                          className="text-white focus:bg-slate-800 focus:text-white"
+                        >
+                          Sin prenda
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-1.5">
+                      Talle
+                    </label>
+                    <Select
+                      value={newMemberForm.talle}
+                      onValueChange={(value) =>
+                        handleNewMemberSelectChange("talle", value)
+                      }
+                    >
+                      <SelectTrigger className="w-full bg-slate-950 border-white/10 text-white">
+                        <SelectValue placeholder="Seleccionar" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-slate-900 border-white/10">
+                        {["S", "M", "L", "XL", "XXL"].map((talle) => (
+                          <SelectItem
+                            key={talle}
+                            value={talle}
+                            className="text-white focus:bg-slate-800 focus:text-white"
+                          >
+                            {talle}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Info Note */}
+              <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4">
+                <p className="text-sm text-green-400">
+                  <strong>Nota:</strong> El socio se creará automáticamente con
+                  estado "Aprobado" ya que es una carga manual de un socio
+                  existente.
+                </p>
+              </div>
+            </form>
+
+            {/* Footer */}
+            <div className="p-6 border-t border-white/5 bg-slate-900 sticky bottom-0 z-10 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={closeNewMemberModal}
+                className="px-4 py-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg font-medium transition-colors cursor-pointer"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                form="new-member-form"
+                disabled={isSubmittingNewMember}
+                onClick={handleNewMemberSubmit}
+                className="flex items-center gap-2 px-6 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              >
+                {isSubmittingNewMember ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Guardando...
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4" />
+                    Guardar Socio
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Detail Modal */}
       {selectedRequest && !requestToDelete && (
