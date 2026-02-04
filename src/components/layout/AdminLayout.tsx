@@ -8,6 +8,7 @@ import {
   Menu,
   X,
   User,
+  AppWindow,
 } from "lucide-react";
 
 // Hook helper for mobile detection
@@ -32,7 +33,23 @@ export function AdminLayout() {
   const location = useLocation();
   const navigate = useNavigate();
 
+  function checkIsLinkActive(currentPath: string, route: string): boolean {
+    const isDashboardRoute = route === "/" || route === "/admin/dashboard";
+
+    return (
+      currentPath === route ||
+      (!isDashboardRoute &&
+        currentPath.startsWith(route) &&
+        currentPath.charAt(route.length) === "/")
+    );
+  }
+
   const menuItems = [
+    {
+      name: "Página Principal",
+      icon: AppWindow,
+      path: "/",
+    },
     {
       name: "Dashboard",
       icon: LayoutDashboard,
@@ -134,7 +151,7 @@ export function AdminLayout() {
         {/* Navigation */}
         <nav className="flex-1 py-6 px-3 space-y-1">
           {menuItems.map((item) => {
-            const isActive = location.pathname.startsWith(item.path);
+            const isActive = checkIsLinkActive(location.pathname, item.path);
             return (
               <Link
                 key={item.path}

@@ -2,6 +2,7 @@ import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
 import { AboutUs } from "@/components/AboutUs";
 import { Tournaments } from "@/components/Tournaments";
+import { Competition } from "@/components/Competition";
 import { History } from "@/components/History";
 import { Merch } from "@/components/Merch";
 import { Membership } from "@/components/Membership";
@@ -18,6 +19,7 @@ export function LandingPage() {
       <Membership />
       <History />
       <Tournaments />
+      <Competition />
       <Merch />
       <Contact />
       <InstagramSection />
