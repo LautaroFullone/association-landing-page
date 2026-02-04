@@ -66,6 +66,8 @@ const INITIAL_FORM_DATA: NewMemberFormData = {
   fechaAltaOriginal: "",
 };
 
+const AVAILABLE_CATEGORIES = ["1ra", "2da", "3ra", "4ta", "5ta", "6ta", "7ma"];
+
 export function MembershipRequests() {
   const [requests, setRequests] = useState<MembershipRequest[]>(MOCK_REQUESTS);
   const [searchTerm, setSearchTerm] = useState("");
@@ -75,6 +77,7 @@ export function MembershipRequests() {
   const [sourceFilter, setSourceFilter] = useState<"todos" | "web" | "manual">(
     "todos",
   );
+  const [categoryFilter, setCategoryFilter] = useState<string>("todas");
 
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
@@ -115,7 +118,10 @@ export function MembershipRequests() {
     const matchesSource =
       sourceFilter === "todos" || req.registrationSource === sourceFilter;
 
-    return matchesSearch && matchesStatus && matchesSource;
+    const matchesCategory =
+      categoryFilter === "todas" || req.categoria === categoryFilter;
+
+    return matchesSearch && matchesStatus && matchesSource && matchesCategory;
   });
 
   // Pagination Logic
@@ -266,6 +272,22 @@ export function MembershipRequests() {
               <option value="todos">Todos</option>
               <option value="web">Web</option>
               <option value="manual">Manual</option>
+            </select>
+          </div>
+
+          <div className="flex items-center gap-2 text-sm text-slate-400 whitespace-nowrap">
+            <span>Categoría:</span>
+            <select
+              className="bg-slate-950 border border-white/10 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-blue-500/50 outline-none"
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+            >
+              <option value="todas">Todas</option>
+              {AVAILABLE_CATEGORIES.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
             </select>
           </div>
         </div>

@@ -45,6 +45,7 @@ export function Dashboard() {
       icon: UserPlus,
       iconBg: "bg-blue-500/20",
       iconColor: "text-blue-400",
+      dotColor: "bg-blue-400",
       title: "Nueva solicitud de socio",
       subtitle: "Juan Pérez solicitó ser socio",
       time: "Hace 2 horas",
@@ -54,6 +55,7 @@ export function Dashboard() {
       icon: CheckCircle,
       iconBg: "bg-green-500/20",
       iconColor: "text-green-400",
+      dotColor: "bg-green-400",
       title: "Inscripción confirmada",
       subtitle: "María García - Torneo Apertura",
       time: "Hace 5 horas",
@@ -63,6 +65,7 @@ export function Dashboard() {
       icon: AlertCircle,
       iconBg: "bg-amber-500/20",
       iconColor: "text-amber-400",
+      dotColor: "bg-amber-400",
       title: "Solicitud pendiente",
       subtitle: "Carlos López - Esperando aprobación",
       time: "Hace 1 día",
@@ -72,6 +75,7 @@ export function Dashboard() {
       icon: Trophy,
       iconBg: "bg-purple-500/20",
       iconColor: "text-purple-400",
+      dotColor: "bg-purple-400",
       title: "Torneo actualizado",
       subtitle: "Gran Abierto de Verano - 32 parejas",
       time: "Hace 2 días",
@@ -158,34 +162,30 @@ export function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
         {/* Recent Activity */}
         <div className="bg-slate-800/50 backdrop-blur-sm p-5 md:p-6 rounded-2xl border border-white/5">
-          <div className="flex items-center gap-2 mb-6">
+          <div className="flex items-center gap-2 mb-5">
             <Clock className="w-5 h-5 text-blue-400" />
             <h3 className="text-lg font-bold text-white">Actividad Reciente</h3>
           </div>
-          <p className="text-slate-500 text-sm -mt-4 mb-6">
-            Últimas acciones en el panel
-          </p>
 
-          <div className="space-y-4">
+          <div className="space-y-0">
             {recentActivity.map((activity) => (
               <div
                 key={activity.id}
-                className="flex items-start gap-4 p-3 rounded-xl bg-slate-900/50 hover:bg-slate-900 transition-colors"
+                className="flex items-center gap-3 py-3 border-b border-white/5 last:border-0"
               >
                 <div
-                  className={`p-2 rounded-lg ${activity.iconBg} ${activity.iconColor} shrink-0`}
-                >
-                  <activity.icon className="w-4 h-4" />
-                </div>
+                  className={`w-2 h-2 rounded-full shrink-0 ${activity.dotColor}`}
+                />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-white truncate">
-                    {activity.title}
-                  </p>
-                  <p className="text-xs text-slate-500 mt-0.5 truncate">
-                    {activity.subtitle}
+                  <p className="text-sm text-white">
+                    <span className="font-medium">{activity.title}</span>
+                    <span className="text-slate-400">
+                      {" "}
+                      · {activity.subtitle}
+                    </span>
                   </p>
                 </div>
-                <span className="text-xs text-slate-600 shrink-0">
+                <span className="text-xs text-slate-500 shrink-0">
                   {activity.time}
                 </span>
               </div>
