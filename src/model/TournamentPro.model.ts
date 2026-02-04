@@ -77,6 +77,7 @@ export interface TournamentPro {
   location?: string;
   prize?: string;
   pairsCount: number;
+  maxPairs: number;
   champion?: Pair;
   runnerUp?: Pair;
   semifinalists?: Pair[];

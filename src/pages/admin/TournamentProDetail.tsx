@@ -157,6 +157,10 @@ export function TournamentProDetail() {
   const [sourceFilter, setSourceFilter] = useState<"todos" | "web" | "manual">(
     "todos",
   );
+  const [paymentFilter, setPaymentFilter] = useState<
+    "todos" | "paid" | "pending"
+  >("todos");
+  const [categoryFilter, setCategoryFilter] = useState<string>("todas");
 
   // Modal states
   const [isNewPairModalOpen, setIsNewPairModalOpen] = useState(false);
@@ -184,13 +188,23 @@ export function TournamentProDetail() {
       pair.player1Name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       pair.player2Name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       pair.player1Dni.includes(searchTerm) ||
-      pair.player2Dni.includes(searchTerm);
+      pair.player2Dni.includes(searchTerm) ||
+      pair.registrationDate.includes(searchTerm);
 
     const matchesSource =
       sourceFilter === "todos" || pair.registrationSource === sourceFilter;
 
-    return matchesSearch && matchesSource;
+    const matchesPayment =
+      paymentFilter === "todos" || pair.paymentStatus === paymentFilter;
+
+    const matchesCategory =
+      categoryFilter === "todas" || pair.category === categoryFilter;
+
+    return matchesSearch && matchesSource && matchesPayment && matchesCategory;
   });
+
+  // Parejas que participan son solo las que tienen pago confirmado
+  const participatingPairs = enrolled.filter((e) => e.paymentStatus === "paid");
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -538,9 +552,17 @@ export function TournamentProDetail() {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-slate-400">
-                      Total Parejas
+                      Parejas Participantes
                     </span>
                     <span className="font-semibold text-white">
+                      {participatingPairs.length}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-slate-400">
+                      Total Inscriptas
+                    </span>
+                    <span className="font-semibold text-slate-400">
                       {enrolled.length}
                     </span>
                   </div>
@@ -578,9 +600,14 @@ export function TournamentProDetail() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             <div className="bg-slate-900 border border-white/5 p-4 rounded-xl">
               <p className="text-slate-400 text-sm font-medium mb-1">
-                Total Parejas
+                Parejas Participantes
               </p>
-              <p className="text-2xl font-bold text-white">{enrolled.length}</p>
+              <p className="text-2xl font-bold text-white">
+                {participatingPairs.length}
+              </p>
+              <p className="text-xs text-slate-500 mt-1">
+                de {enrolled.length} inscriptas
+              </p>
             </div>
             <div className="bg-slate-900 border border-white/5 p-4 rounded-xl">
               <p className="text-slate-400 text-sm font-medium mb-1">
@@ -623,12 +650,12 @@ export function TournamentProDetail() {
 
           {/* Filters */}
           <div className="bg-slate-900/50 border border-white/5 rounded-xl p-4 mb-6 flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 flex-1 w-full">
-              <div className="relative w-full md:w-96">
+            <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 flex-1 w-full flex-wrap">
+              <div className="relative w-full md:w-72">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                 <input
                   type="text"
-                  placeholder="Buscar por nombre o DNI..."
+                  placeholder="Buscar por nombre, DNI o fecha..."
                   className="w-full bg-slate-950 border border-white/10 rounded-lg pl-10 pr-4 py-2 text-white placeholder:text-slate-500 focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500 outline-none transition-all"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -637,6 +664,23 @@ export function TournamentProDetail() {
 
               <div className="flex items-center gap-2 text-sm text-slate-400 whitespace-nowrap">
                 <Filter className="w-4 h-4" />
+                <span>Estado:</span>
+                <select
+                  className="bg-slate-950 border border-white/10 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-yellow-500/50 outline-none"
+                  value={paymentFilter}
+                  onChange={(e) =>
+                    setPaymentFilter(
+                      e.target.value as "todos" | "paid" | "pending",
+                    )
+                  }
+                >
+                  <option value="todos">Todos</option>
+                  <option value="paid">Pagado</option>
+                  <option value="pending">Pendiente</option>
+                </select>
+              </div>
+
+              <div className="flex items-center gap-2 text-sm text-slate-400 whitespace-nowrap">
                 <span>Origen:</span>
                 <select
                   className="bg-slate-950 border border-white/10 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-yellow-500/50 outline-none"
@@ -650,6 +694,22 @@ export function TournamentProDetail() {
                   <option value="todos">Todos</option>
                   <option value="web">Web</option>
                   <option value="manual">Manual</option>
+                </select>
+              </div>
+
+              <div className="flex items-center gap-2 text-sm text-slate-400 whitespace-nowrap">
+                <span>Categoría:</span>
+                <select
+                  className="bg-slate-950 border border-white/10 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-yellow-500/50 outline-none"
+                  value={categoryFilter}
+                  onChange={(e) => setCategoryFilter(e.target.value)}
+                >
+                  <option value="todas">Todas</option>
+                  {AVAILABLE_CATEGORIES.map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>

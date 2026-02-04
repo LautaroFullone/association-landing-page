@@ -13,5 +13,6 @@ export interface MembershipRequest {
   talle: string;
   fechaSolicitud: string;
   estado: "pendiente" | "aprobado" | "rechazado";
+  registrationSource: "web" | "manual";
   fotoUrl?: string; // Mocked
 }

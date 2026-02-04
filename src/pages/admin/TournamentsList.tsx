@@ -1,16 +1,8 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import {
-  Plus,
-  Calendar,
-  MapPin,
-  Users,
-  MoreHorizontal,
-  Trash2,
-  Trophy,
-  Eye,
-} from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Plus, Calendar, MapPin, Trash2, Trophy, Eye } from "lucide-react";
 import { ConfirmActionModal } from "@/components/ConfirmActionModal";
+import { Button } from "@/components/ui/button";
 
 interface Tournament {
   id: number;
@@ -21,6 +13,7 @@ interface Tournament {
   categories: string[];
   status: "abierto" | "proximamente" | "finalizado";
   enrolledCount: number;
+  maxPairs: number;
 }
 
 const MOCK_TOURNAMENTS: Tournament[] = [
@@ -33,6 +26,7 @@ const MOCK_TOURNAMENTS: Tournament[] = [
     categories: ["2da", "3ra", "4ta", "5ta", "6ta", "7ma"],
     status: "abierto",
     enrolledCount: 24,
+    maxPairs: 32,
   },
   {
     id: 2,
@@ -43,6 +37,7 @@ const MOCK_TOURNAMENTS: Tournament[] = [
     categories: ["1ra", "2da", "3ra", "4ta"],
     status: "proximamente",
     enrolledCount: 5,
+    maxPairs: 24,
   },
   {
     id: 3,
@@ -53,10 +48,12 @@ const MOCK_TOURNAMENTS: Tournament[] = [
     categories: ["1ra", "2da", "3ra", "4ta", "5ta", "6ta"],
     status: "finalizado",
     enrolledCount: 32,
+    maxPairs: 32,
   },
 ];
 
 export function TournamentsList() {
+  const navigate = useNavigate();
   const [tournaments, setTournaments] =
     useState<Tournament[]>(MOCK_TOURNAMENTS);
   const [tournamentToDelete, setTournamentToDelete] =
@@ -81,6 +78,17 @@ export function TournamentsList() {
         return "bg-slate-500/10 text-slate-400 border-slate-500/20";
     }
   };
+
+  //   const getProgressBarColor = (status: string) => {
+  //     switch (status) {
+  //       case "abierto":
+  //         return "from-green-500 to-green-400";
+  //       case "proximamente":
+  //         return "from-blue-500 to-blue-400";
+  //       default:
+  //         return "from-slate-500 to-slate-400";
+  //     }
+  //   };
 
   return (
     <div className="animate-in fade-in duration-500">
@@ -113,23 +121,44 @@ export function TournamentsList() {
                 >
                   {tournament.status}
                 </span>
-                <div className="flex gap-1">
-                  {/* <button className="p-1.5 hover:bg-slate-800 rounded text-slate-400 hover:text-white transition-colors cursor-pointer">
-                    <Edit className="w-4 h-4" />
-                  </button> */}
-                  <Link
-                    to={`/admin/tournaments/${tournament.id}`}
-                    className="flex items-center gap-2 px-3 py-2 bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-400 rounded-lg text-sm font-medium transition-colors"
+                {/* <div className="flex gap-1">
+                 
+                  <Button
+                    onClick={() =>
+                      navigate(`/admin/tournaments/${tournament.id}`)
+                    }
+                    variant="outline"
+                    className="bg-transparent text-white"
                   >
                     <Eye className="w-4 h-4" />
                     Gestionar
-                  </Link>
+                  </Button>
                   <button
                     onClick={() => setTournamentToDelete(tournament)}
                     className="p-1.5 hover:bg-red-500/10 rounded text-slate-400 hover:text-red-400 transition-colors cursor-pointer"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
+                </div> */}
+                <div className="flex items-center justify-end gap-2 transition-opacity">
+                  <Button
+                    onClick={() => {
+                      navigate(`/admin/tournaments/${tournament.id}`);
+                    }}
+                    className="flex items-center gap-2 p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors"
+                    title="Ver Detalle"
+                  >
+                    <Eye className="w-4 h-4" />
+                    Gestionar
+                  </Button>
+
+                  <Button
+                    onClick={() => setTournamentToDelete(tournament)}
+                    className="p-2 hover:bg-red-500/20 rounded-lg text-slate-400 hover:text-red-400 transition-colors"
+                    title="Eliminar"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
                 </div>
               </div>
 
@@ -155,20 +184,41 @@ export function TournamentsList() {
               </div>
             </div>
 
-            <div className="bg-slate-950/50 p-4 border-t border-white/5 flex items-center justify-between">
-              <div className="flex items-center gap-2 text-sm text-slate-300">
-                <Users className="w-4 h-4" />
-                <span className="font-medium">
-                  {tournament.enrolledCount} Parejas Confirmadas
-                </span>
+            {/* <div className="bg-slate-950/50 p-4 border-t border-white/5">
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-slate-400">Parejas Confirmadas</span>
+                  <span className="text-white font-medium">
+                    {tournament.enrolledCount}/{tournament.maxPairs}
+                  </span>
+                </div>
+                <div className="w-full bg-slate-700 rounded-full h-2">
+                  <div
+                    className={`bg-gradient-to-r ${getProgressBarColor(tournament.status)} h-2 rounded-full transition-all`}
+                    style={{
+                      width: `${Math.min((tournament.enrolledCount / tournament.maxPairs) * 100, 100)}%`,
+                    }}
+                  />
+                </div>
               </div>
-              <Link
-                to={`/admin/tournaments/${tournament.id}`}
-                className="text-sm font-medium text-blue-400 hover:text-blue-300 flex items-center gap-1 group-hover:translate-x-1 transition-transform"
-              >
-                Ver Inscriptos <MoreHorizontal className="w-4 h-4" />
-              </Link>
-            </div>
+              <div className="flex items-center justify-between mt-3">
+                <div className="flex items-center gap-2 text-sm text-slate-400">
+                  <Users className="w-4 h-4" />
+                  <span>
+                    {Math.round(
+                      (tournament.enrolledCount / tournament.maxPairs) * 100,
+                    )}
+                    % ocupado
+                  </span>
+                </div>
+                <Link
+                  to={`/admin/tournaments/${tournament.id}`}
+                  className="text-sm font-medium text-blue-400 hover:text-blue-300 flex items-center gap-1 group-hover:translate-x-1 transition-transform"
+                >
+                  Ver Inscriptos <MoreHorizontal className="w-4 h-4" />
+                </Link>
+              </div>
+            </div> */}
           </div>
         ))}
       </div>

@@ -218,6 +218,7 @@ export const tournamentsPro: TournamentPro[] = [
     location: "Club Deportivo Central",
     prize: "$50,000",
     pairsCount: 16,
+    maxPairs: 24,
     zones,
     bracket,
     description:
@@ -234,6 +235,7 @@ export const tournamentsPro: TournamentPro[] = [
     location: "Pádel Club Norte",
     prize: "$75,000",
     pairsCount: 12,
+    maxPairs: 16,
     description: "Copa tradicional de primavera. Categoría femenina 2da.",
   },
   {
@@ -247,6 +249,7 @@ export const tournamentsPro: TournamentPro[] = [
     location: "Arena Pádel Premium",
     prize: "$100,000",
     pairsCount: 8,
+    maxPairs: 16,
     description:
       "El torneo más importante del año. Solo las mejores parejas clasificadas.",
   },
@@ -261,6 +264,7 @@ export const tournamentsPro: TournamentPro[] = [
     location: "Club Deportivo Central",
     prize: "$45,000",
     pairsCount: 16,
+    maxPairs: 16,
     champion: pairs[0],
     runnerUp: pairs[1],
     semifinalists: [pairs[2], pairs[3]],
@@ -279,6 +283,7 @@ export const tournamentsPro: TournamentPro[] = [
     location: "Pádel Club Sur",
     prize: "$60,000",
     pairsCount: 12,
+    maxPairs: 12,
     champion: pairs[5],
     runnerUp: pairs[6],
     semifinalists: [pairs[7]],

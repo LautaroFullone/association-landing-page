@@ -26,19 +26,22 @@ import { Separator } from "@/components/ui/separator";
 
 const statusConfig: Record<
   TournamentStatus,
-  { label: string; className: string }
+  { label: string; className: string; progressClass: string }
 > = {
   "en-curso": {
     label: "En Curso",
     className: "bg-green-500/10 text-green-400 border-green-500/20",
+    progressClass: "from-green-500 to-green-400",
   },
   proximo: {
     label: "Próximo",
     className: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+    progressClass: "from-blue-500 to-blue-400",
   },
   finalizado: {
     label: "Finalizado",
     className: "bg-slate-500/10 text-slate-400 border-slate-500/20",
+    progressClass: "from-slate-500 to-slate-400",
   },
 };
 
@@ -365,6 +368,26 @@ export function TournamentsProList() {
                           {tournament.prize}
                         </span>
                       )}
+                    </div>
+
+                    {/* Progress bar */}
+                    <div className="mt-3 space-y-1.5">
+                      <div className="flex justify-between text-xs">
+                        <span className="text-slate-400">
+                          Parejas confirmadas
+                        </span>
+                        <span className="text-white font-medium">
+                          {tournament.pairsCount}/{tournament.maxPairs}
+                        </span>
+                      </div>
+                      <div className="w-full bg-slate-700 rounded-full h-1.5">
+                        <div
+                          className={`bg-gradient-to-r ${status.progressClass} h-1.5 rounded-full transition-all`}
+                          style={{
+                            width: `${Math.min((tournament.pairsCount / tournament.maxPairs) * 100, 100)}%`,
+                          }}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>

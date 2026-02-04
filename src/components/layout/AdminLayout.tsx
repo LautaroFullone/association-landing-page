@@ -64,7 +64,7 @@ export function AdminLayout() {
       path: "/admin/dashboard",
     },
     {
-      name: "Solicitudes de Socios",
+      name: "Socios",
       icon: Users,
       path: "/admin/requests",
     },

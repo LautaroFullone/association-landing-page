@@ -21,6 +21,8 @@ import {
   UserPlus,
   Loader2,
   Save,
+  Globe,
+  Pencil,
 } from "lucide-react";
 import {
   Select,
@@ -32,6 +34,7 @@ import {
 import { ConfirmActionModal } from "@/components/ConfirmActionModal";
 import type { MembershipRequest } from "@/model/MembershipRequest.model";
 import { MOCK_REQUESTS } from "@/mock/membershipRequests.mock";
+import { Button } from "@/components/ui/button";
 
 interface NewMemberFormData {
   nombre: string;
@@ -69,6 +72,9 @@ export function MembershipRequests() {
   const [statusFilter, setStatusFilter] = useState<
     "todos" | "pendiente" | "aprobado" | "rechazado"
   >("todos");
+  const [sourceFilter, setSourceFilter] = useState<"todos" | "web" | "manual">(
+    "todos",
+  );
 
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
@@ -105,7 +111,11 @@ export function MembershipRequests() {
 
     const matchesStatus =
       statusFilter === "todos" || req.estado === statusFilter;
-    return matchesSearch && matchesStatus;
+
+    const matchesSource =
+      sourceFilter === "todos" || req.registrationSource === sourceFilter;
+
+    return matchesSearch && matchesStatus && matchesSource;
   });
 
   // Pagination Logic
@@ -128,6 +138,7 @@ export function MembershipRequests() {
   const clearFilters = () => {
     setSearchTerm("");
     setStatusFilter("todos");
+    setSourceFilter("todos");
     setCurrentPage(1);
   };
 
@@ -167,6 +178,7 @@ export function MembershipRequests() {
         newMemberForm.fechaAltaOriginal ||
         new Date().toLocaleDateString("es-AR"),
       estado: "aprobado",
+      registrationSource: "manual",
     };
 
     setRequests((prev) => [newMember, ...prev]);
@@ -184,11 +196,9 @@ export function MembershipRequests() {
     <div className="animate-in fade-in duration-500 relative">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-white">
-            Solicitudes de Socios
-          </h1>
+          <h1 className="text-3xl font-bold text-white">Socios</h1>
           <p className="text-slate-400 mt-1">
-            Gestiona las nuevas solicitudes de alta
+            Gestiona las nuevas solicitudes de alta y los socios existentes.
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -242,6 +252,22 @@ export function MembershipRequests() {
               <option value="rechazado">Rechazados</option>
             </select>
           </div>
+
+          <div className="flex items-center gap-2 text-sm text-slate-400 whitespace-nowrap">
+            <Filter className="w-4 h-4" />
+            <span>Origen:</span>
+            <select
+              className="bg-slate-950 border border-white/10 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-blue-500/50 outline-none flex-1 md:flex-none"
+              value={sourceFilter}
+              onChange={(e) =>
+                setSourceFilter(e.target.value as "todos" | "web" | "manual")
+              }
+            >
+              <option value="todos">Todos</option>
+              <option value="web">Web</option>
+              <option value="manual">Manual</option>
+            </select>
+          </div>
         </div>
 
         <button
@@ -270,6 +296,9 @@ export function MembershipRequests() {
                 </th>
                 <th className="p-4 text-sm font-semibold text-slate-300">
                   Fecha Solicitud
+                </th>
+                <th className="p-4 text-sm font-semibold text-slate-300">
+                  Origen
                 </th>
                 <th className="p-4 text-sm font-semibold text-slate-300">
                   Estado
@@ -302,6 +331,17 @@ export function MembershipRequests() {
                     </td>
                     <td className="p-4 text-slate-400 text-sm">
                       {req.fechaSolicitud}
+                    </td>
+                    <td className="p-4">
+                      {req.registrationSource === "web" ? (
+                        <span className="inline-flex items-center gap-1 text-sky-400 text-xs font-medium bg-sky-500/10 px-2 py-1 rounded-full border border-sky-500/20">
+                          <Globe className="w-3 h-3" /> Web
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-purple-400 text-xs font-medium bg-purple-500/10 px-2 py-1 rounded-full border border-purple-500/20">
+                          <Pencil className="w-3 h-3" /> Manual
+                        </span>
+                      )}
                     </td>
                     <td className="p-4">
                       <Select
@@ -357,29 +397,31 @@ export function MembershipRequests() {
                     </td>
                     <td className="p-4 text-right">
                       <div className="flex items-center justify-end gap-2 transition-opacity">
-                        <button
+                        <Button
                           onClick={() => {
                             setSelectedRequest(req);
                           }}
-                          className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors"
+                          className="flex items-center gap-2 p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors"
                           title="Ver Detalle"
                         >
                           <Eye className="w-4 h-4" />
-                        </button>
-                        <button
+                          Ver Detalle
+                        </Button>
+
+                        <Button
                           onClick={() => setRequestToDelete(req)}
                           className="p-2 hover:bg-red-500/20 rounded-lg text-slate-400 hover:text-red-400 transition-colors"
                           title="Eliminar"
                         >
                           <Trash2 className="w-4 h-4" />
-                        </button>
+                        </Button>
                       </div>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={6} className="p-8 text-center text-slate-500">
+                  <td colSpan={7} className="p-8 text-center text-slate-500">
                     No se encontraron solicitudes que coincidan con los filtros.
                   </td>
                 </tr>

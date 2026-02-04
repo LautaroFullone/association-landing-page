@@ -229,14 +229,14 @@ export function Dashboard() {
       </div>
 
       {/* Tournament Status */}
-      <div className="bg-slate-800/50 backdrop-blur-sm p-5 md:p-6 rounded-2xl border border-white/5">
+      {/* <div className="bg-slate-800/50 backdrop-blur-sm p-5 md:p-6 rounded-2xl border border-white/5">
         <div className="flex items-center gap-2 mb-6">
           <Trophy className="w-5 h-5 text-purple-400" />
           <h3 className="text-lg font-bold text-white">Estado de Torneos</h3>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {/* Tournament 1 */}
+        
           <div className="p-4 rounded-xl bg-slate-900/50 border border-white/5">
             <div className="flex justify-between items-start mb-3">
               <div>
@@ -261,7 +261,7 @@ export function Dashboard() {
             </div>
           </div>
 
-          {/* Tournament 2 */}
+ 
           <div className="p-4 rounded-xl bg-slate-900/50 border border-white/5">
             <div className="flex justify-between items-start mb-3">
               <div>
@@ -288,7 +288,7 @@ export function Dashboard() {
             </div>
           </div>
 
-          {/* Tournament 3 */}
+      
           <div className="p-4 rounded-xl bg-slate-900/50 border border-white/5">
             <div className="flex justify-between items-start mb-3">
               <div>
@@ -315,7 +315,7 @@ export function Dashboard() {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

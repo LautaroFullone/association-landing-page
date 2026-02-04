@@ -16,6 +16,7 @@ export const MOCK_REQUESTS: MembershipRequest[] = [
     talle: "L",
     fechaSolicitud: "2026-02-01",
     estado: "pendiente",
+    registrationSource: "web",
   },
   {
     id: "2",
@@ -32,6 +33,7 @@ export const MOCK_REQUESTS: MembershipRequest[] = [
     talle: "S",
     fechaSolicitud: "2026-01-30",
     estado: "aprobado",
+    registrationSource: "web",
   },
   {
     id: "3",
@@ -48,6 +50,7 @@ export const MOCK_REQUESTS: MembershipRequest[] = [
     talle: "XL",
     fechaSolicitud: "2026-02-02",
     estado: "pendiente",
+    registrationSource: "manual",
   },
   {
     id: "4",
@@ -64,6 +67,7 @@ export const MOCK_REQUESTS: MembershipRequest[] = [
     talle: "M",
     fechaSolicitud: "2026-01-28",
     estado: "rechazado",
+    registrationSource: "web",
   },
   {
     id: "5",
@@ -80,6 +84,7 @@ export const MOCK_REQUESTS: MembershipRequest[] = [
     talle: "M",
     fechaSolicitud: "2026-02-02",
     estado: "pendiente",
+    registrationSource: "web",
   },
   {
     id: "6",
@@ -96,6 +101,7 @@ export const MOCK_REQUESTS: MembershipRequest[] = [
     talle: "S",
     fechaSolicitud: "2026-02-03",
     estado: "pendiente",
+    registrationSource: "manual",
   },
   {
     id: "7",
@@ -112,6 +118,7 @@ export const MOCK_REQUESTS: MembershipRequest[] = [
     talle: "XXL",
     fechaSolicitud: "2026-02-01",
     estado: "aprobado",
+    registrationSource: "web",
   },
   {
     id: "8",
@@ -128,6 +135,7 @@ export const MOCK_REQUESTS: MembershipRequest[] = [
     talle: "M",
     fechaSolicitud: "2026-01-25",
     estado: "aprobado",
+    registrationSource: "web",
   },
   {
     id: "9",
@@ -144,6 +152,7 @@ export const MOCK_REQUESTS: MembershipRequest[] = [
     talle: "L",
     fechaSolicitud: "2026-02-04",
     estado: "pendiente",
+    registrationSource: "manual",
   },
   {
     id: "10",
@@ -160,6 +169,7 @@ export const MOCK_REQUESTS: MembershipRequest[] = [
     talle: "M",
     fechaSolicitud: "2026-02-02",
     estado: "rechazado",
+    registrationSource: "web",
   },
   {
     id: "11",
@@ -176,6 +186,7 @@ export const MOCK_REQUESTS: MembershipRequest[] = [
     talle: "XL",
     fechaSolicitud: "2026-02-05",
     estado: "pendiente",
+    registrationSource: "web",
   },
   {
     id: "12",
@@ -192,6 +203,7 @@ export const MOCK_REQUESTS: MembershipRequest[] = [
     talle: "XS",
     fechaSolicitud: "2026-02-01",
     estado: "pendiente",
+    registrationSource: "manual",
   },
   {
     id: "13",
@@ -208,6 +220,7 @@ export const MOCK_REQUESTS: MembershipRequest[] = [
     talle: "L",
     fechaSolicitud: "2026-01-20",
     estado: "aprobado",
+    registrationSource: "web",
   },
   {
     id: "14",
@@ -224,6 +237,7 @@ export const MOCK_REQUESTS: MembershipRequest[] = [
     talle: "S",
     fechaSolicitud: "2026-02-06",
     estado: "pendiente",
+    registrationSource: "web",
   },
   {
     id: "15",
@@ -240,6 +254,7 @@ export const MOCK_REQUESTS: MembershipRequest[] = [
     talle: "M",
     fechaSolicitud: "2026-02-03",
     estado: "pendiente",
+    registrationSource: "manual",
   },
   {
     id: "16",
@@ -256,6 +271,7 @@ export const MOCK_REQUESTS: MembershipRequest[] = [
     talle: "M",
     fechaSolicitud: "2026-02-07",
     estado: "pendiente",
+    registrationSource: "web",
   },
   {
     id: "17",
@@ -272,6 +288,7 @@ export const MOCK_REQUESTS: MembershipRequest[] = [
     talle: "L",
     fechaSolicitud: "2026-01-15",
     estado: "aprobado",
+    registrationSource: "web",
   },
   {
     id: "18",
@@ -288,6 +305,7 @@ export const MOCK_REQUESTS: MembershipRequest[] = [
     talle: "S",
     fechaSolicitud: "2026-02-08",
     estado: "pendiente",
+    registrationSource: "manual",
   },
   {
     id: "19",
@@ -304,6 +322,7 @@ export const MOCK_REQUESTS: MembershipRequest[] = [
     talle: "XL",
     fechaSolicitud: "2026-02-05",
     estado: "rechazado",
+    registrationSource: "web",
   },
   {
     id: "20",
@@ -320,6 +339,7 @@ export const MOCK_REQUESTS: MembershipRequest[] = [
     talle: "M",
     fechaSolicitud: "2026-02-09",
     estado: "pendiente",
+    registrationSource: "web",
   },
   {
     id: "21",
@@ -336,5 +356,6 @@ export const MOCK_REQUESTS: MembershipRequest[] = [
     talle: "S",
     fechaSolicitud: "2026-02-10",
     estado: "pendiente",
+    registrationSource: "manual",
   },
 ];
