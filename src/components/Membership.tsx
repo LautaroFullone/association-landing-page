@@ -103,7 +103,7 @@ export function Membership() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-          <div className="sticky top-24">
+          <div className="space-y-8">
             <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
               Súmate a la <br />
               <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-400 to-indigo-400">
