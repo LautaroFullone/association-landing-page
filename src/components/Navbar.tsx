@@ -7,13 +7,15 @@ export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
   const navItems = [
-    { name: "Sobre Nosotros", href: "#about" },
+    //  { name: "Sobre Nosotros", href: "#about" },
     { name: "Asociate", href: "#membership" },
-    { name: "Historia", href: "#history" },
+    //  { name: "Historia", href: "#history" },
     { name: "Torneos", href: "#tournaments" },
-    { name: "Merch", href: "#merch" },
+    //  { name: "Merch", href: "#merch" },
     { name: "Contacto", href: "#contact" },
     { name: "Acceso", href: "/admin/login" },
+    { name: "Torneos PRO", href: "#tournaments" },
+    { name: "Ranking PRO", href: "#ranking" },
   ];
 
   return (

@@ -104,23 +104,42 @@ const createZoneStandings = (zonePairs: Pair[]): ZoneStanding[] => {
   }));
 };
 
-// Mock Matches
+// Mock Matches - with varied statuses for demo
 const createZoneMatches = (zonePairs: Pair[], zone: string): Match[] => {
   const matches: Match[] = [];
+  let matchIndex = 0;
+
+  // Different match configurations for variety
+  const matchConfigs = [
+    // Finalizados (con 2 sets)
+    { status: "finalizado" as const, score1: [6, 6], score2: [4, 3] },
+    { status: "finalizado" as const, score1: [7, 6], score2: [5, 4] },
+    // Finalizado con 3 sets (partido reñido)
+    { status: "finalizado" as const, score1: [6, 4, 7], score2: [4, 6, 5] },
+    // En juego
+    { status: "en-juego" as const, score1: [6, 3], score2: [4, 3] },
+    { status: "en-juego" as const, score1: [4], score2: [5] },
+    // Pendientes (sin scores)
+    { status: "pendiente" as const, score1: undefined, score2: undefined },
+    { status: "pendiente" as const, score1: undefined, score2: undefined },
+  ];
+
   for (let i = 0; i < zonePairs.length; i++) {
     for (let j = i + 1; j < zonePairs.length; j++) {
+      const config = matchConfigs[matchIndex % matchConfigs.length];
       matches.push({
         id: `m-${zone}-${i}-${j}`,
         pair1: zonePairs[i],
         pair2: zonePairs[j],
-        status: "finalizado",
-        score1: [6, 6],
-        score2: [4, 3],
+        status: config.status,
+        score1: config.score1,
+        score2: config.score2,
         date: "2025-01-25",
         time: `${10 + i}:00`,
         court: `Cancha ${(i % 3) + 1}`,
         zone,
       });
+      matchIndex++;
     }
   }
   return matches;
