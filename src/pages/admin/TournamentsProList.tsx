@@ -15,10 +15,7 @@ import {
   Radio,
   Medal,
 } from "lucide-react";
-import {
-  tournamentsPro as initialTournaments,
-  liveMatches,
-} from "@/data/tournaments-pro.data";
+import { tournamentsPro as initialTournaments } from "@/data/tournaments-pro.data";
 import type {
   TournamentPro,
   TournamentStatus,

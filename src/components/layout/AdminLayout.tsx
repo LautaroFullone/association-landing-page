@@ -9,7 +9,6 @@ import {
   X,
   User,
   AppWindow,
-  Zap,
   Medal,
 } from "lucide-react";
 

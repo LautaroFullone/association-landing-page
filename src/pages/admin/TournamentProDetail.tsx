@@ -29,7 +29,6 @@ import {
   Minus,
   Swords,
   GitBranch,
-  Edit2,
   Plus,
 } from "lucide-react";
 import {

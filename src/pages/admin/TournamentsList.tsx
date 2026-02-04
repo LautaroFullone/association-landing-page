@@ -7,7 +7,6 @@ import {
   Users,
   MoreHorizontal,
   Trash2,
-  Edit,
   Trophy,
   Eye,
 } from "lucide-react";
