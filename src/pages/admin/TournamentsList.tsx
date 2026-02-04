@@ -9,6 +9,7 @@ import {
   Trash2,
   Edit,
   Trophy,
+  Eye,
 } from "lucide-react";
 import { ConfirmActionModal } from "@/components/ConfirmActionModal";
 
@@ -114,9 +115,16 @@ export function TournamentsList() {
                   {tournament.status}
                 </span>
                 <div className="flex gap-1">
-                  <button className="p-1.5 hover:bg-slate-800 rounded text-slate-400 hover:text-white transition-colors cursor-pointer">
+                  {/* <button className="p-1.5 hover:bg-slate-800 rounded text-slate-400 hover:text-white transition-colors cursor-pointer">
                     <Edit className="w-4 h-4" />
-                  </button>
+                  </button> */}
+                  <Link
+                    to={`/admin/tournaments/${tournament.id}`}
+                    className="flex items-center gap-2 px-3 py-2 bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-400 rounded-lg text-sm font-medium transition-colors"
+                  >
+                    <Eye className="w-4 h-4" />
+                    Gestionar
+                  </Link>
                   <button
                     onClick={() => setTournamentToDelete(tournament)}
                     className="p-1.5 hover:bg-red-500/10 rounded text-slate-400 hover:text-red-400 transition-colors cursor-pointer"

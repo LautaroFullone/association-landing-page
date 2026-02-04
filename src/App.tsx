@@ -7,6 +7,7 @@ import { MembershipRequests } from "@/pages/admin/MembershipRequests";
 import { TournamentsList } from "@/pages/admin/TournamentsList";
 import { TournamentDetail } from "@/pages/admin/TournamentDetail";
 import { TournamentCreate } from "@/pages/admin/TournamentCreate";
+import { TournamentsProList } from "@/pages/admin/TournamentsProList";
 
 function App() {
   return (
@@ -22,6 +23,8 @@ function App() {
           <Route path="tournaments" element={<TournamentsList />} />
           <Route path="tournaments/new" element={<TournamentCreate />} />
           <Route path="tournaments/:id" element={<TournamentDetail />} />
+          {/* Torneos PRO */}
+          <Route path="tournaments-pro" element={<TournamentsProList />} />
         </Route>
       </Routes>
     </Router>

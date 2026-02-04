@@ -9,6 +9,8 @@ import {
   X,
   User,
   AppWindow,
+  Zap,
+  Medal,
 } from "lucide-react";
 
 // Hook helper for mobile detection
@@ -24,6 +26,13 @@ const useMobile = () => {
 
   return isMobile;
 };
+
+interface MenuItem {
+  name: string;
+  icon: React.ComponentType<{ className?: string }>;
+  path: string;
+  isPro?: boolean;
+}
 
 export function AdminLayout() {
   const [isDesktopCollapsed, setIsDesktopCollapsed] = useState(false);
@@ -44,7 +53,7 @@ export function AdminLayout() {
     );
   }
 
-  const menuItems = [
+  const menuItems: MenuItem[] = [
     {
       name: "Página Principal",
       icon: AppWindow,
@@ -64,6 +73,12 @@ export function AdminLayout() {
       name: "Torneos",
       icon: Trophy,
       path: "/admin/tournaments",
+    },
+    {
+      name: "Torneos",
+      icon: Medal,
+      path: "/admin/tournaments-pro",
+      isPro: true,
     },
   ];
 
@@ -159,7 +174,9 @@ export function AdminLayout() {
                 onClick={() => isMobile && setMobileMenuOpen(false)}
                 className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-all group ${
                   isActive
-                    ? "bg-blue-600/10 text-blue-400"
+                    ? item.isPro
+                      ? "bg-yellow-500/10 text-yellow-400"
+                      : "bg-blue-600/10 text-blue-400"
                     : "text-slate-400 hover:bg-white/5 hover:text-white"
                 } ${isDesktopCollapsed && !isMobile ? "justify-center" : ""}`}
                 title={isDesktopCollapsed ? item.name : undefined}
@@ -167,12 +184,23 @@ export function AdminLayout() {
                 <item.icon
                   className={`w-5 h-5 shrink-0 ${
                     isActive
-                      ? "text-blue-400"
-                      : "text-slate-400 group-hover:text-white"
+                      ? item.isPro
+                        ? "text-yellow-400"
+                        : "text-blue-400"
+                      : item.isPro
+                        ? "text-yellow-500/70 group-hover:text-yellow-400"
+                        : "text-slate-400 group-hover:text-white"
                   }`}
                 />
                 {(!isDesktopCollapsed || isMobile) && (
-                  <span className="font-medium text-sm">{item.name}</span>
+                  <span className="font-medium text-sm flex items-center gap-2">
+                    {item.name}
+                    {item.isPro && (
+                      <span className="text-[10px] font-bold bg-yellow-500/20 text-yellow-400 px-1.5 py-0.5 rounded border border-yellow-500/30">
+                        PRO
+                      </span>
+                    )}
+                  </span>
                 )}
               </Link>
             );
