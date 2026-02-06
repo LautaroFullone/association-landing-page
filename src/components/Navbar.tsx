@@ -8,14 +8,10 @@ export function Navbar() {
   const navigate = useNavigate();
 
   const navItems = [
-    //  { name: "Sobre Nosotros", href: "#about" },
-    { name: "Asociate", href: "#membership" },
-    //  { name: "Historia", href: "#history" },
-    { name: "Torneos Disponibles", href: "#tournaments" },
-    //  { name: "Merch", href: "#merch" },
+    { name: "Hacete Socio", href: "#membership" },
+    { name: "Inscribite", href: "#tournaments" },
     { name: "Contacto", href: "#contact" },
-    //  { name: "Acceso", href: "/admin/login" },
-    { name: "Fixture Oficial", href: "/fixture" },
+    { name: "Torneos", href: "/torneos" },
     { name: "Ranking Oficial", href: "/ranking" },
   ];
 
