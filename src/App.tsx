@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { LandingPage } from "@/pages/LandingPage";
 import { TournamentsPage } from "@/pages/TournamentsPage";
+import { TournamentDetailPage } from "@/pages/TournamentDetailPage";
 import { RankingPage } from "@/pages/RankingPage";
 import { LoginPage } from "@/pages/admin/LoginPage";
 import { Dashboard } from "@/pages/admin/Dashboard";
@@ -19,6 +20,7 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/torneos" element={<TournamentsPage />} />
+        <Route path="/torneos/:id" element={<TournamentDetailPage />} />
         <Route path="/ranking" element={<RankingPage />} />
         <Route path="/admin/login" element={<LoginPage />} />
 

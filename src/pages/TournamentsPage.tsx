@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { Link } from "react-router-dom";
 import {
   Trophy,
   Calendar,
@@ -348,13 +349,15 @@ function TournamentCard({
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             ) : (
-              <Button
-                variant="outline"
-                className="w-full border-white/10 hover:bg-blue-600 hover:text-white hover:border-blue-600 rounded-xl py-6 font-bold text-lg transition-all cursor-pointer"
-              >
-                Ver Detalles
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
+              <Link to={`/torneos/${tournament.id}`}>
+                <Button
+                  variant="outline"
+                  className="w-full border-white/10 hover:bg-blue-600 hover:text-white hover:border-blue-600 rounded-xl py-6 font-bold text-lg transition-all cursor-pointer"
+                >
+                  Ver Detalles
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
             )}
           </div>
         </div>
