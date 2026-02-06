@@ -11,12 +11,12 @@ export function Navbar() {
     //  { name: "Sobre Nosotros", href: "#about" },
     { name: "Asociate", href: "#membership" },
     //  { name: "Historia", href: "#history" },
-    { name: "Torneos", href: "#tournaments" },
+    { name: "Torneos Disponibles", href: "#tournaments" },
     //  { name: "Merch", href: "#merch" },
     { name: "Contacto", href: "#contact" },
     //  { name: "Acceso", href: "/admin/login" },
-    { name: "Fixture Oficial", href: "#tournaments" },
-    { name: "Ranking Oficial", href: "#ranking" },
+    { name: "Fixture Oficial", href: "/fixture" },
+    { name: "Ranking Oficial", href: "/ranking" },
   ];
 
   return (
