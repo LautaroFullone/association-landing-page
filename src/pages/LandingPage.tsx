@@ -19,8 +19,8 @@ export function LandingPage() {
       <Membership />
       <History />
       <Tournaments />
-      <Competition />
       <Merch />
+      <Competition />
       <Contact />
       <InstagramSection />
 

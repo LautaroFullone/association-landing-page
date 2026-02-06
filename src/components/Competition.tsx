@@ -1,36 +1,34 @@
-import { Trophy, Radio, GitBranch, Medal, ExternalLink } from "lucide-react";
+import { Trophy, Radio, Calendar, Medal, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const features = [
   {
     icon: Radio,
-    title: "Fixtures en Vivo",
+    title: "Seguí los Partidos",
     description:
-      "Seguí los resultados y horarios de los partidos en tiempo real.",
-    highlight: "Actualizaciones instantáneas",
+      "Enterate de los resultados al instante y mirá quiénes avanzan en cada torneo. Viví el minuto a minuto desde donde estés.",
+    //  highlight: "Resultados en vivo",
   },
   {
-    icon: GitBranch,
-    title: "Brackets y Llaves",
+    icon: Calendar,
+    title: "Próximas Fechas",
     description:
-      "Visualizá la estructura del torneo y el camino hacia la final.",
-    highlight: "Formatos personalizables",
+      "No te quedes afuera. Consultá el calendario de torneos, fechas de inscripción y organizá tu agenda deportiva.",
+    //  highlight: "Inscripciones",
   },
   {
     icon: Medal,
-    title: "Ranking",
+    title: "Ranking Anual",
     description:
-      "Consultá la clasificación de jugadores y equipos por categoría.",
-    highlight: "Sistema de puntos oficial",
+      "¿Querés saber en qué puesto estás? Mirá la tabla actualizada y seguí tu progreso torneo a torneo.",
+    //  highlight: "Sumá puntos",
   },
 ];
 
 export function Competition() {
-  // URL del sistema de competición - cambiar cuando tengas tu propio deploy
-  const competitionSystemUrl = "https://padel-mardelplata.vercel.app/torneos";
-
   return (
     <section
-      id="competicion"
+      id="competition"
       className="relative py-24 md:py-32 overflow-hidden"
     >
       {/* Background Effects */}
@@ -52,20 +50,20 @@ export function Competition() {
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/20 mb-6">
             <Trophy className="w-4 h-4 text-purple-400" />
             <span className="text-purple-300 text-sm font-medium">
-              Sistema de Competición
+              Competencia Oficial
             </span>
           </div>
 
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
-            Seguí los{" "}
+            Toda la emoción,{" "}
             <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-              Torneos en Vivo
+              En un solo lugar
             </span>
           </h2>
 
           <p className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto">
-            Sistema integral de gestión de torneos. Consultá fixtures,
-            resultados, brackets y rankings en tiempo real.
+            Ya sea que juegues o vengas a alentar, acá tenés todo lo necesario
+            para no perderte nada del circuito local.
           </p>
         </div>
 
@@ -94,43 +92,38 @@ export function Competition() {
                 </p>
 
                 {/* Highlight badge */}
-                <span className="inline-flex items-center text-xs font-medium text-purple-300 bg-purple-500/10 px-3 py-1.5 rounded-full border border-purple-500/20">
+                {/* <span className="inline-flex items-center text-xs font-medium text-purple-300 bg-purple-500/10 px-3 py-1.5 rounded-full border border-purple-500/20">
                   {feature.highlight}
-                </span>
+                </span> */}
               </div>
             </div>
           ))}
         </div>
 
-        {/* CTA Button */}
-        <div className="text-center">
-          <a
-            href={competitionSystemUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-semibold rounded-xl shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transition-all duration-300 hover:scale-105"
+        {/* CTA Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <Link
+            to="/torneos"
+            className="group inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-semibold rounded-xl shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transition-all duration-300 hover:scale-105 w-full sm:w-auto justify-center"
           >
-            <span className="text-lg">Acceder al Sistema de Competición</span>
-            <ExternalLink className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-          </a>
+            <span className="text-lg">Fixture Oficial</span>
+            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          </Link>
 
-          <p className="text-slate-500 text-sm mt-4">
-            Sistema disponible para socios y público general
+          <Link
+            to="/ranking"
+            className="group inline-flex items-center gap-3 px-8 py-4 bg-slate-800 hover:bg-slate-700 text-white font-semibold rounded-xl border border-slate-700 hover:border-slate-600 transition-all duration-300 hover:scale-105 w-full sm:w-auto justify-center"
+          >
+            <span className="text-lg">Ranking</span>
+            <Medal className="w-5 h-5 group-hover:scale-110 transition-transform text-yellow-500" />
+          </Link>
+        </div>
+
+        {/* <div className="text-center mt-6">
+          <p className="text-slate-500 text-sm">
+            Información siempre disponible para toda la comunidad
           </p>
-        </div>
-
-        {/* Live indicator */}
-        <div className="flex justify-center mt-12">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/10 border border-green-500/20">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-            </span>
-            <span className="text-green-400 text-sm font-medium">
-              Sistema activo 24/7
-            </span>
-          </div>
-        </div>
+        </div> */}
       </div>
     </section>
   );

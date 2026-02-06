@@ -75,8 +75,14 @@ export function AdminLayout() {
     },
     {
       name: "Torneos",
-      icon: Medal,
+      icon: Trophy,
       path: "/admin/tournaments-pro",
+      isPro: true,
+    },
+    {
+      name: "Ranking",
+      icon: Medal,
+      path: "/admin/ranking",
       isPro: true,
     },
   ];

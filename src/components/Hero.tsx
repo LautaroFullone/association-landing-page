@@ -52,11 +52,11 @@ export function Hero() {
             </Button>
             <Button
               size="lg"
-              onClick={() => (window.location.href = "#tournaments")}
+              onClick={() => (window.location.href = "#competition")}
               variant="outline"
               className="text-lg px-8 py-7 rounded-full backdrop-blur-sm transition-all text-black cursor-pointer"
             >
-              Nuestros Torneos
+              Competencias
             </Button>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   MapPin,
   Calendar,
@@ -14,6 +14,9 @@ import {
   Phone,
   Mail,
   Edit2,
+  ChevronLeft,
+  ChevronRight,
+  Flame,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -27,6 +30,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 
 interface Tournament {
   id: number;
@@ -45,6 +49,7 @@ interface Tournament {
     player1: { name: string; lastName: string };
     player2: { name: string; lastName: string };
   };
+  lastSpots?: boolean;
 }
 
 export function Tournaments() {
@@ -69,8 +74,16 @@ export function Tournaments() {
   });
 
   const [isSubmittingForm, setIsSubmittingForm] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  const tournaments: Tournament[] = [
+  // Drag state
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+
+  // MOCK DATA - Filtered for open tournaments mostly, but keeping structure
+  const allTournaments: Tournament[] = [
     {
       id: 1,
       name: "Gran Abierto de Verano",
@@ -84,6 +97,7 @@ export function Tournaments() {
       status: "abierto",
       price: 15000,
       prize: "$150.000",
+      lastSpots: true,
     },
     {
       id: 2,
@@ -95,9 +109,70 @@ export function Tournaments() {
       gender: ["masculino", "femenino"],
       registrationDeadline: "2026-02-28",
       pairsCount: 24,
-      status: "proximamente",
+      status: "abierto",
       price: 20000,
       prize: "$300.000",
+      lastSpots: false,
+    },
+    {
+      id: 4,
+      name: "Torneo Express Fin de Semana",
+      startDate: "2026-03-10",
+      endDate: "2026-03-12",
+      location: "Paddle Point",
+      categories: ["4ta", "5ta", "6ta"],
+      gender: ["masculino", "mixto"],
+      registrationDeadline: "2026-03-05",
+      pairsCount: 16,
+      status: "abierto",
+      price: 12000,
+      prize: "Indumentaria",
+      lastSpots: true,
+    },
+    {
+      id: 5,
+      name: "Circuito Femenino - Fecha 2",
+      startDate: "2026-03-15",
+      endDate: "2026-03-17",
+      location: "Los Naranjos",
+      categories: ["3ra", "4ta", "5ta", "6ta", "7ma"],
+      gender: ["femenino"],
+      registrationDeadline: "2026-03-12",
+      pairsCount: 20,
+      status: "abierto",
+      price: 14000,
+      prize: "$100.000 + Trofeos",
+      lastSpots: false,
+    },
+    {
+      id: 6,
+      name: "Torneo Aniversario Club Raqueta",
+      startDate: "2026-03-20",
+      endDate: "2026-03-24",
+      location: "Club de Raqueta",
+      categories: ["2da", "3ra", "4ta", "5ta", "6ta"],
+      gender: ["masculino", "femenino"],
+      registrationDeadline: "2026-03-15",
+      pairsCount: 40,
+      status: "abierto",
+      price: 18000,
+      prize: "Paletas + Indumentaria",
+      lastSpots: false,
+    },
+    {
+      id: 7,
+      name: "Copa Challenge Apertura",
+      startDate: "2026-04-01",
+      endDate: "2026-04-05",
+      location: "Complejo Central",
+      categories: ["1ra", "2da", "3ra", "4ta", "5ta", "6ta", "7ma"],
+      gender: ["masculino", "mixto"],
+      registrationDeadline: "2026-03-28",
+      pairsCount: 64,
+      status: "abierto",
+      price: 22000,
+      prize: "$400.000",
+      lastSpots: true,
     },
     {
       id: 3,
@@ -110,35 +185,15 @@ export function Tournaments() {
       registrationDeadline: "2025-12-05",
       pairsCount: 16,
       status: "finalizado",
-      champion: {
-        player1: { name: "Juan", lastName: "Pérez" },
-        player2: { name: "Martin", lastName: "Gala" },
-      },
       price: 0,
       prize: "$500.000",
     },
   ];
 
-  const genderLabels: Record<string, string> = {
-    masculino: "Masculino",
-    femenino: "Femenino",
-    mixto: "Mixto",
-  };
-
-  const statusConfig: Record<string, { label: string; className: string }> = {
-    abierto: {
-      label: "Inscripción Abierta",
-      className: "bg-green-500/10 text-green-400 border-green-500/20",
-    },
-    proximamente: {
-      label: "Próximamente",
-      className: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-    },
-    finalizado: {
-      label: "Finalizado",
-      className: "bg-slate-500/10 text-slate-400 border-slate-500/20",
-    },
-  };
+  // Filter only 'abierto' tournaments
+  const activeTournaments = allTournaments.filter(
+    (t) => t.status === "abierto",
+  );
 
   const dayMonthFormat = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -170,9 +225,8 @@ export function Tournaments() {
     const total = selectedTournament.price;
     let discount = 0;
     let memberCount = 0;
-    const MEMBER_DISCOUNT = selectedTournament.price * 0.1; // 10% discount per member
+    const MEMBER_DISCOUNT = selectedTournament.price * 0.1;
 
-    // Simulate validation - in real app this would call API
     if (formData.player1MemberId) {
       discount += MEMBER_DISCOUNT;
       memberCount++;
@@ -216,6 +270,78 @@ export function Tournaments() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Scroll Helpers
+  const scroll = (direction: "left" | "right") => {
+    if (scrollContainerRef.current) {
+      const container = scrollContainerRef.current;
+      const cardWidth = container.firstElementChild?.clientWidth || 0;
+      const gap = 32; // gap-8 = 2rem = 32px
+      const scrollAmount = cardWidth + gap;
+
+      const currentScroll = container.scrollLeft;
+      const targetScroll =
+        direction === "left"
+          ? currentScroll - scrollAmount
+          : currentScroll + scrollAmount;
+
+      container.scrollTo({
+        left: targetScroll,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  // Drag Handlers
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!scrollContainerRef.current) return;
+    setIsDragging(true);
+    setStartX(e.pageX - scrollContainerRef.current.offsetLeft);
+    setScrollLeft(scrollContainerRef.current.scrollLeft);
+    setIsPaused(true);
+  };
+
+  const handleMouseLeave = () => {
+    if (!isDragging) return;
+    setIsDragging(false);
+    setIsPaused(false);
+  };
+
+  const handleMouseUp = () => {
+    if (!isDragging) return;
+    setIsDragging(false);
+    setIsPaused(false);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !scrollContainerRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - scrollContainerRef.current.offsetLeft;
+    const walk = (x - startX) * 2; // Scroll speed multiplier
+    scrollContainerRef.current.scrollLeft = scrollLeft - walk;
+  };
+
+  // Auto-play
+  useEffect(() => {
+    if (activeTournaments.length <= 1 || isPaused) return;
+
+    const interval = setInterval(() => {
+      if (scrollContainerRef.current) {
+        const container = scrollContainerRef.current;
+        const maxScroll = container.scrollWidth - container.clientWidth;
+
+        // If we reached the end, go back to start, otherwise scroll right
+        if (container.scrollLeft >= maxScroll - 10) {
+          // tolerance
+          container.scrollTo({ left: 0, behavior: "smooth" });
+        } else {
+          scroll("right");
+        }
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [activeTournaments.length, isPaused]);
+
   return (
     <section
       id="tournaments"
@@ -229,178 +355,205 @@ export function Tournaments() {
         <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
           <div className="max-w-2xl">
             <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
-              Últimos{" "}
+              Inscripciones{" "}
               <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-400 to-indigo-500">
-                Torneos
+                Abiertas
               </span>
             </h2>
             <p className="text-slate-400 text-lg">
-              Prepárate para competir. Consulta el calendario oficial y asegura
-              tu lugar en los eventos más importantes de la temporada.
+              Asegurá tu lugar en los próximos eventos. ¡Cupos limitados!
             </p>
           </div>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {tournaments.map((tournament) => {
-            const status = statusConfig[tournament.status];
-            return (
-              <Card
-                key={tournament.id}
-                className="group overflow-hidden border-white/10 bg-slate-900 transition-all hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/5"
+
+          {/* Navigation Buttons */}
+          {activeTournaments.length > 0 && (
+            <div className="flex gap-3">
+              <Button
+                onClick={() => scroll("left")}
+                variant="outline"
+                size="icon"
+                className="rounded-full w-12 h-12 bg-white text-slate-900 hover:bg-slate-200 border-0 shadow-lg cursor-pointer"
               >
-                <CardContent className="p-0">
-                  {/* Header with status badge */}
-                  <div className="relative bg-slate-800/50 px-6 py-5">
-                    <Badge
-                      variant="outline"
-                      className={`${status.className} uppercase tracking-wider text-[10px] font-bold`}
-                    >
-                      {status.label}
-                    </Badge>
-                    <div className="mt-4">
-                      <h3 className="text-3xl font-bold text-white group-hover:text-blue-400 transition-colors text-balance">
-                        {tournament.name}
-                      </h3>
-                    </div>
-                  </div>
+                <ChevronLeft className="h-6 w-6" />
+              </Button>
+              <Button
+                onClick={() => scroll("right")}
+                variant="outline"
+                size="icon"
+                className="rounded-full w-12 h-12 bg-white text-slate-900 hover:bg-slate-200 border-0 shadow-lg cursor-pointer"
+              >
+                <ChevronRight className="h-6 w-6" />
+              </Button>
+            </div>
+          )}
+        </div>
 
-                  {/* Content */}
-                  <div className="space-y-6 p-6">
-                    {/* Key Info Grid */}
-                    <div className="grid grid-cols-1 gap-5">
-                      <div className="flex items-start gap-4">
-                        <Calendar className="h-6 w-6 shrink-0 text-blue-500 mt-0.5" />
-                        <div>
-                          <p className="text-white text-lg font-semibold">
-                            {dayMonthFormat(tournament.startDate)} -{" "}
+        {activeTournaments.length === 0 ? (
+          /* Empty State */
+          <div className="bg-slate-900/50 border border-white/5 rounded-3xl p-12 text-center max-w-2xl mx-auto">
+            <div className="w-20 h-20 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Calendar className="w-10 h-10 text-slate-500" />
+            </div>
+            <h3 className="text-2xl font-bold text-white mb-2">
+              Próximamente habrá torneos
+            </h3>
+            <p className="text-slate-400">
+              Actualmente no hay inscripciones abiertas. Seguinos en nuestras
+              redes para enterarte de las próximas fechas.
+            </p>
+          </div>
+        ) : (
+          /* Scroll Container */
+          <div
+            className="relative group/carousel -mx-4 px-4 sm:mx-0 sm:px-0"
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+          >
+            <div
+              ref={scrollContainerRef}
+              className={cn(
+                "flex gap-8 overflow-x-auto snap-x snap-mandatory pt-2 pb-12 px-1 [&::-webkit-scrollbar]:hidden scrollbar-none",
+                isDragging ? "cursor-grabbing snap-none" : "cursor-grab",
+              )}
+              onMouseDown={handleMouseDown}
+              onMouseLeave={handleMouseLeave}
+              onMouseUp={handleMouseUp}
+              onMouseMove={handleMouseMove}
+            >
+              {activeTournaments.map((tournament) => (
+                <div
+                  key={tournament.id}
+                  className="min-w-[85vw] sm:min-w-[420px] md:min-w-[380px] lg:min-w-[32%] shrink-0 snap-center first:pl-2 last:pr-2"
+                >
+                  <Card className="group relative overflow-hidden border-white/10 bg-slate-900 transition-all hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/5 h-full flex flex-col rounded-3xl select-none">
+                    {/* Last Spots Badge - Friendly Version */}
+                    {tournament.lastSpots && (
+                      <div className="absolute top-4 right-4 z-20 animate-pulse">
+                        <Badge className="bg-gradient-to-r from-amber-500 to-orange-600 border-0 shadow-lg shadow-orange-500/20 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-white">
+                          <Flame className="w-3.5 h-3.5 mr-1.5 fill-white" />
+                          Últimos lugares
+                        </Badge>
+                      </div>
+                    )}
+
+                    <CardContent className="p-0 flex flex-col h-full pointer-events-none">
+                      {/* Disable pointer events on content to facilitate drag */}
+                      {/* Header */}
+                      <div className="relative bg-slate-800/50 px-8 py-8 shrink-0">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 mb-4">
+                          <span className="relative flex h-2 w-2">
+                            <span className="absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                          </span>
+
+                          <span className="text-amber-400 text-xs font-bold uppercase tracking-wider">
+                            Inscripciónes hasta:{" "}
                             {dayMonthFormat(tournament.endDate)}
-                          </p>
-                          <p className="text-slate-400 text-sm mt-0.5">
-                            Fecha del torneo
-                          </p>
+                          </span>
                         </div>
-                      </div>
-
-                      <div className="flex items-start gap-4">
-                        <Clock className="h-6 w-6 shrink-0 text-amber-500 mt-0.5" />
                         <div>
-                          <p className="text-white text-lg font-semibold">
-                            Cierra el{" "}
-                            {dayMonthFormat(tournament.registrationDeadline)}
-                          </p>
-                          <p className="text-slate-400 text-sm mt-0.5">
-                            Inscripción límite
-                          </p>
+                          <h3 className="text-2xl font-bold text-white group-hover:text-blue-400 transition-colors text-balance leading-tight">
+                            {tournament.name}
+                          </h3>
                         </div>
                       </div>
-
-                      {tournament.location && (
-                        <div className="flex items-start gap-4">
-                          <MapPin className="h-6 w-6 shrink-0 text-blue-500 mt-0.5" />
-                          <div>
-                            <p className="text-white text-lg font-semibold">
-                              {tournament.location}
-                            </p>
-                            <p className="text-slate-400 text-sm mt-0.5">
-                              Sede
-                            </p>
+                      {/* Content */}
+                      <div className="p-8 space-y-6 flex flex-col flex-1">
+                        <div className="space-y-4 flex-1">
+                          <div className="flex items-start gap-4">
+                            <Calendar className="h-5 w-5 shrink-0 text-blue-500 mt-1" />
+                            <div>
+                              <p className="text-white font-medium">
+                                {dayMonthFormat(tournament.startDate)} -{" "}
+                                {dayMonthFormat(tournament.endDate)}
+                              </p>
+                              <p className="text-slate-500 text-sm">Fecha</p>
+                            </div>
                           </div>
-                        </div>
-                      )}
 
-                      <div className="flex items-start gap-4">
-                        <Users className="h-6 w-6 shrink-0 text-blue-500 mt-0.5" />
-                        <div>
-                          <p className="text-white text-lg font-medium text-balance">
-                            {tournament.gender
-                              .map((g) => genderLabels[g])
-                              .reduce(
-                                (acc, curr, i, arr) =>
-                                  i === 0
-                                    ? curr
-                                    : i === arr.length - 1
-                                      ? `${acc} y ${curr}`
-                                      : `${acc}, ${curr}`,
-                                "",
-                              )}
-                          </p>
-                          <p className="text-slate-400 text-sm mt-0.5">
-                            Modalidad
-                          </p>
-                        </div>
-                      </div>
+                          {/* <div className="flex items-start gap-4">
+                            <Clock className="h-5 w-5 shrink-0 text-amber-500 mt-1" />
+                            <div>
+                              <p className="text-white font-medium">
+                                Cierra{" "}
+                                {dayMonthFormat(
+                                  tournament.registrationDeadline,
+                                )}
+                              </p>
+                              <p className="text-slate-500 text-sm">Deadline</p>
+                            </div>
+                          </div> */}
 
-                      <div className="flex items-start gap-4">
-                        <Trophy className="h-6 w-6 shrink-0 text-blue-500 mt-0.5" />
-                        <div>
-                          <p className="text-white text-lg font-medium text-balance leading-relaxed">
-                            {tournament.categories.join(", ")}
-                          </p>
-                          <p className="text-slate-400 text-sm mt-0.5">
-                            Categorías
-                          </p>
-                        </div>
-                      </div>
+                          {tournament.location && (
+                            <div className="flex items-start gap-4">
+                              <MapPin className="h-5 w-5 shrink-0 text-blue-500 mt-1" />
+                              <div>
+                                <p className="text-white font-medium">
+                                  {tournament.location}
+                                </p>
+                                <p className="text-slate-500 text-sm">Sede</p>
+                              </div>
+                            </div>
+                          )}
 
-                      <div className="flex items-center gap-3 text-white">
-                        <User className="h-5 w-5 shrink-0 text-blue-500" />
-                        <span className="text-base font-medium">
-                          {tournament.pairsCount} parejas
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Champions (only for finished tournaments) */}
-                    {tournament.status === "finalizado" &&
-                      tournament.champion && (
-                        <div className="rounded-xl bg-blue-500/5 border border-blue-500/10 p-4">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Trophy className="h-4 w-4 text-yellow-500" />
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-blue-400">
-                              Campeones
-                            </span>
+                          <div className="flex items-start gap-4">
+                            <Users className="h-5 w-5 shrink-0 text-blue-500 mt-1" />
+                            <div>
+                              <p className="text-white font-medium capitalize">
+                                {tournament.gender.join(", ")}
+                              </p>
+                              <p className="text-slate-500 text-sm">
+                                Modalidad
+                              </p>
+                            </div>
                           </div>
-                          <p className="font-semibold text-white">
-                            {tournament.champion.player1.name}{" "}
-                            {tournament.champion.player1.lastName} /{" "}
-                            {tournament.champion.player2.name}{" "}
-                            {tournament.champion.player2.lastName}
-                          </p>
-                        </div>
-                      )}
-
-                    {tournament.status !== "finalizado" && (
-                      <>
-                        {/* Prize */}
-                        {tournament.prize && (
-                          <div className="flex items-center justify-between border-t border-white/5 pt-5">
-                            <span className="text-sm text-slate-500">
-                              Premio total
-                            </span>
-                            <span className="text-xl font-bold text-blue-400">
-                              {tournament.prize}
-                            </span>
+                          <div className="flex items-start gap-4">
+                            <Trophy className="h-5 w-5 shrink-0 text-blue-500 mt-1" />
+                            <div>
+                              <p className="text-white font-medium">
+                                {tournament.categories.slice(0, 3).join(", ")}
+                                {tournament.categories.length > 3 && "..."}
+                              </p>
+                              <p className="text-slate-500 text-sm">
+                                Categorías
+                              </p>
+                            </div>
                           </div>
-                        )}
+                          {tournament.prize && (
+                            <div className="flex items-start gap-4">
+                              <div className="w-5 h-5 flex items-center justify-center text-green-500 mt-1 font-bold text-lg">
+                                $
+                              </div>
+                              <div>
+                                <p className="text-white font-bold text-lg">
+                                  {tournament.prize}
+                                </p>
+                                <p className="text-slate-500 text-sm">
+                                  Premios
+                                </p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
 
-                        {/* CTA */}
-                        {tournament.status === "abierto" && (
+                        {/* Button needs to be clickable, so re-enable pointer events */}
+                        <div className="pointer-events-auto mt-auto">
                           <Button
                             onClick={() => handleRegistration(tournament)}
-                            className="w-full bg-blue-600 hover:bg-blue-500 text-white rounded-full py-6 font-semibold transition-all group-hover:shadow-[0_0_20px_rgba(37,99,235,0.3)] cursor-pointer"
+                            className="w-full bg-blue-600 hover:bg-blue-500 text-white rounded-xl py-6 font-bold text-lg transition-all shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 cursor-pointer"
                           >
                             Inscribirse
-                            <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                            <ArrowRight className="ml-2 h-5 w-5" />
                           </Button>
-                        )}
-                      </>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Payment Modal Overlay */}
@@ -716,8 +869,8 @@ export function Tournaments() {
                         ¡Inscripción Exitosa!
                       </h3>
                       <p className="text-slate-400">
-                        Tu equipo ha sido inscripto correctamente. Te enviamos
-                        el comprobante por mail.
+                        Tu equipo ha sido inscripto correctamente. Nos vamos a
+                        contactar a la brevedad.
                       </p>
                     </div>
                   </div>

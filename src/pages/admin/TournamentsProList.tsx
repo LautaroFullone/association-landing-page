@@ -127,10 +127,13 @@ export function TournamentsProList() {
               </p>
             </div>
           </div>
-          <button className="flex items-center gap-2 bg-yellow-500 hover:bg-yellow-400 text-black px-4 py-2 rounded-lg font-semibold transition-colors shadow-lg shadow-yellow-500/20">
+          <Link
+            to="/admin/tournaments-pro/new"
+            className="flex items-center gap-2 bg-yellow-500 hover:bg-yellow-400 text-black px-4 py-2 rounded-lg font-semibold transition-colors shadow-lg shadow-yellow-500/20"
+          >
             <Plus className="w-5 h-5" />
             Nuevo Torneo PRO
-          </button>
+          </Link>
         </div>
       </div>
 

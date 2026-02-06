@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import logo from "@/assets/logo.png";
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
 
   const navItems = [
     //  { name: "Sobre Nosotros", href: "#about" },
@@ -13,9 +14,9 @@ export function Navbar() {
     { name: "Torneos", href: "#tournaments" },
     //  { name: "Merch", href: "#merch" },
     { name: "Contacto", href: "#contact" },
-    { name: "Acceso", href: "/admin/login" },
-    { name: "Torneos PRO", href: "#tournaments" },
-    { name: "Ranking PRO", href: "#ranking" },
+    //  { name: "Acceso", href: "/admin/login" },
+    { name: "Fixture Oficial", href: "#tournaments" },
+    { name: "Ranking Oficial", href: "#ranking" },
   ];
 
   return (
@@ -24,7 +25,7 @@ export function Navbar() {
         <div className="flex items-center justify-between h-20">
           <div
             className="flex items-center gap-3 cursor-pointer"
-            onClick={() => (window.location.href = "#hero")}
+            onClick={() => navigate("/")}
           >
             <div className="w-12 h-12 rounded-xl bg-white p-1.5 shadow-lg group overflow-hidden">
               <img
