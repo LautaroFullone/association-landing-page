@@ -9,12 +9,12 @@ import {
   MapPin,
   Users,
   Trophy,
+  Plus,
 } from "lucide-react";
 import { tournamentsPro as initialTournaments } from "@/data/tournaments-pro.data";
 import type {
   TournamentPro,
   TournamentStatus,
-  Gender,
 } from "@/model/TournamentPro.model";
 import { ConfirmActionModal } from "@/components/ConfirmActionModal";
 // import { Separator } from "@/components/ui/separator";
@@ -40,11 +40,11 @@ const statusConfig: Record<
   },
 };
 
-const genderLabels: Record<Gender, string> = {
-  masculino: "Masculino",
-  femenino: "Femenino",
-  mixto: "Mixto",
-};
+// const genderLabels: Record<Gender, string> = {
+//   masculino: "Masculino",
+//   femenino: "Femenino",
+//   mixto: "Mixto",
+// };
 
 // Features comparison data
 // const proFeatures = [
@@ -102,6 +102,21 @@ export function TournamentsProList() {
 
   return (
     <div className="animate-in fade-in duration-500">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-white">Torneos</h1>
+          <p className="text-slate-400 mt-1">
+            Administra los torneos y sus inscripciones
+          </p>
+        </div>
+        <Link
+          to="/admin/tournaments-pro/new"
+          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-lg shadow-blue-600/20"
+        >
+          <Plus className="w-5 h-5" />
+          Nuevo Torneo
+        </Link>
+      </div>
       {/* PRO Header */}
       {/* <div className="mb-8 p-6 rounded-2xl bg-gradient-to-r from-yellow-500/10 via-orange-500/10 to-yellow-500/10 border border-yellow-500/20">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -319,11 +334,11 @@ export function TournamentsProList() {
                       >
                         {status.label}
                       </span>
-                      {tournament.zones && (
+                      {/* {tournament.zones && (
                         <span className="px-2 py-0.5 rounded text-xs font-medium bg-purple-500/10 text-purple-400 border border-purple-500/20">
                           {tournament.zones.length} Zonas
                         </span>
-                      )}
+                      )} */}
                       {/* {tournament.bracket && (
                         <span className="px-2 py-0.5 rounded text-xs font-medium bg-orange-500/10 text-orange-400 border border-orange-500/20">
                           Bracket
@@ -354,7 +369,7 @@ export function TournamentsProList() {
                         {tournament.pairsCount} parejas
                       </span>
                     </div>
-                    <div className="mt-2 flex flex-wrap gap-2">
+                    {/* <div className="mt-2 flex flex-wrap gap-2">
                       <span className="px-2 py-0.5 rounded text-xs font-medium bg-slate-700 text-slate-300">
                         {tournament.category}
                       </span>
@@ -366,7 +381,7 @@ export function TournamentsProList() {
                           {tournament.prize}
                         </span>
                       )}
-                    </div>
+                    </div> */}
 
                     {/* Progress bar */}
                     <div className="mt-3 space-y-1.5">

@@ -202,7 +202,7 @@ export function AdminLayout() {
                     {item.name}
                     {item.isPro && (
                       <span className="text-[10px] font-bold bg-yellow-500/20 text-yellow-400 px-1.5 py-0.5 rounded border border-yellow-500/30">
-                        PRO
+                        V2
                       </span>
                     )}
                   </span>

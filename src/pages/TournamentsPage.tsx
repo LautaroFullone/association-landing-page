@@ -352,27 +352,29 @@ function TournamentCard({
           </div>
 
           {/* Button */}
-          <div className="mt-auto">
-            {canRegister ? (
-              <Button
-                onClick={() => onRegister(tournament)}
-                className="w-full bg-blue-600 hover:bg-blue-500 text-white rounded-xl py-6 font-bold text-lg transition-all shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 cursor-pointer"
-              >
-                Inscribirse
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            ) : (
-              <Link to={`/torneos/${tournament.id}`}>
+          {tournament.status !== "proximo" && (
+            <div className="mt-auto">
+              {canRegister ? (
                 <Button
-                  variant="outline"
-                  className="w-full border-white/10 hover:bg-blue-600 hover:text-white hover:border-blue-600 rounded-xl py-6 font-bold text-lg transition-all cursor-pointer"
+                  onClick={() => onRegister(tournament)}
+                  className="w-full bg-blue-600 hover:bg-blue-500 text-white rounded-xl py-6 font-bold text-lg transition-all shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 cursor-pointer"
                 >
-                  Ver Detalles
+                  Inscribirse
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
-              </Link>
-            )}
-          </div>
+              ) : (
+                <Link to={`/torneos/${tournament.id}`}>
+                  <Button
+                    variant="outline"
+                    className="w-full border-white/10 hover:bg-blue-600 hover:text-white hover:border-blue-600 rounded-xl py-6 font-bold text-lg transition-all cursor-pointer"
+                  >
+                    Ver Detalles
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </Link>
+              )}
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
@@ -626,39 +628,6 @@ export function TournamentsPage() {
             </div>
 
             {/* Quick Stats */}
-            <div className="flex flex-wrap gap-3 md:gap-4">
-              <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-900/50 border border-white/5">
-                <Trophy className="h-4 w-4 text-blue-400" />
-                <span className="text-sm">
-                  <span className="font-semibold text-white">
-                    {stats.total}
-                  </span>{" "}
-                  <span className="text-slate-400">torneos</span>
-                </span>
-              </div>
-              {stats.enCurso > 0 && (
-                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
-                  <Zap className="h-4 w-4 text-amber-400" />
-                  <span className="text-sm">
-                    <span className="font-semibold text-amber-400">
-                      {stats.enCurso}
-                    </span>{" "}
-                    <span className="text-slate-400">en curso</span>
-                  </span>
-                </div>
-              )}
-              {stats.abiertas > 0 && (
-                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-                  <ClipboardList className="h-4 w-4 text-emerald-400" />
-                  <span className="text-sm">
-                    <span className="font-semibold text-emerald-400">
-                      {stats.abiertas}
-                    </span>{" "}
-                    <span className="text-slate-400">abiertos</span>
-                  </span>
-                </div>
-              )}
-            </div>
           </div>
         </div>
       </section>

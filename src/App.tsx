@@ -13,6 +13,7 @@ import { TournamentCreate } from "@/pages/admin/TournamentCreate";
 import { TournamentsProList } from "@/pages/admin/TournamentsProList";
 import { TournamentProDetail } from "@/pages/admin/TournamentProDetail";
 import { NewTournamentPro } from "@/pages/admin/NewTournamentPro";
+import { RankingAdmin } from "@/pages/admin/RankingAdmin";
 
 function App() {
   return (
@@ -35,6 +36,9 @@ function App() {
           <Route path="tournaments-pro" element={<TournamentsProList />} />
           <Route path="tournaments-pro/new" element={<NewTournamentPro />} />
           <Route path="tournaments-pro/:id" element={<TournamentProDetail />} />
+
+          {/* Ranking */}
+          <Route path="ranking" element={<RankingAdmin />} />
         </Route>
       </Routes>
     </Router>

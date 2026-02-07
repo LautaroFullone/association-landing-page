@@ -1032,7 +1032,7 @@ export function MembershipRequests() {
               </div>
 
               {/* Payment Info Mock */}
-              <div className="bg-slate-950/50 p-4 rounded-xl border border-white/5">
+              {/* <div className="bg-slate-950/50 p-4 rounded-xl border border-white/5">
                 <div className="flex items-center justify-between mb-4">
                   <h4 className="text-sm font-semibold text-white">
                     Estado del Pago
@@ -1048,7 +1048,7 @@ export function MembershipRequests() {
                 <div className="mt-2 text-xs text-slate-500">
                   Transacción ID: #MP-{selectedRequest.id.padStart(8, "0")}
                 </div>
-              </div>
+              </div> */}
             </div>
 
             <div className="p-6 border-t border-white/5 bg-slate-900 sticky bottom-0 z-10 flex justify-end gap-3">

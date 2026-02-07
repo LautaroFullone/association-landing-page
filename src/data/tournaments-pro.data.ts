@@ -329,6 +329,7 @@ export const rankings: {
     points: 1000 - index * 50,
     tournamentsPlayed: 8 - Math.floor(index / 2),
     tournamentsWon: Math.max(0, 3 - index),
+    category: index < 3 ? "1ra" : index < 6 ? "2da" : index < 8 ? "3ra" : "4ta",
   })),
   femenino: players.slice(10, 16).map((player, index) => ({
     position: index + 1,
@@ -336,6 +337,7 @@ export const rankings: {
     points: 950 - index * 45,
     tournamentsPlayed: 7 - Math.floor(index / 2),
     tournamentsWon: Math.max(0, 2 - index),
+    category: index < 2 ? "1ra" : index < 4 ? "2da" : "3ra",
   })),
 };
 

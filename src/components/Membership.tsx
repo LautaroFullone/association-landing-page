@@ -561,8 +561,8 @@ export function Membership() {
                     ¡Bienvenido Socio!
                   </h3>
                   <p className="text-slate-400 mb-8 max-w-xs">
-                    El pago se realizó con éxito. Ya sos parte de la comunidad
-                    oficial. Recibirás tú carnet digital por mail.
+                    El pago se realizó con éxito. Nos pondremos en contacto a la
+                    brevedad.
                   </p>
                   <Button
                     onClick={() => {
@@ -583,7 +583,7 @@ export function Membership() {
                       });
                     }}
                     variant="outline"
-                    className="border-white/10 text-white hover:bg-white/5"
+                    className="mt-4 bg-transparent text-white"
                   >
                     Volver al inicio
                   </Button>

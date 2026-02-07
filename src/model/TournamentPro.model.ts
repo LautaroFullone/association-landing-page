@@ -92,4 +92,5 @@ export interface RankingEntry {
   points: number;
   tournamentsPlayed: number;
   tournamentsWon: number;
+  category: Category;
 }
