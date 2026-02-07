@@ -14,10 +14,12 @@ import { TournamentsProList } from "@/pages/admin/TournamentsProList";
 import { TournamentProDetail } from "@/pages/admin/TournamentProDetail";
 import { NewTournamentPro } from "@/pages/admin/NewTournamentPro";
 import { RankingAdmin } from "@/pages/admin/RankingAdmin";
+import { ScrollToAnchor } from "@/components/ScrollToAnchor";
 
 function App() {
   return (
     <Router>
+      <ScrollToAnchor />
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/torneos" element={<TournamentsPage />} />
