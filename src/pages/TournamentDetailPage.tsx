@@ -1956,7 +1956,7 @@ export function TournamentDetailPage() {
   );
 
   // Get values from URL or use defaults
-  const activeTab = searchParams.get("tab") || "llaves";
+  const activeTab = searchParams.get("tab") || "parejas";
   const selectedCategory =
     searchParams.get("categoria") || tournament.categories[0] || "";
   const selectedGender =

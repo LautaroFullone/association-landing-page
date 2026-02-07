@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  Plus,
   Search,
   Trash2,
   Eye,
@@ -10,10 +9,6 @@ import {
   MapPin,
   Users,
   Trophy,
-  Zap,
-  GitBranch,
-  Radio,
-  Medal,
 } from "lucide-react";
 import { tournamentsPro as initialTournaments } from "@/data/tournaments-pro.data";
 import type {
@@ -22,7 +17,7 @@ import type {
   Gender,
 } from "@/model/TournamentPro.model";
 import { ConfirmActionModal } from "@/components/ConfirmActionModal";
-import { Separator } from "@/components/ui/separator";
+// import { Separator } from "@/components/ui/separator";
 
 const statusConfig: Record<
   TournamentStatus,
@@ -52,28 +47,28 @@ const genderLabels: Record<Gender, string> = {
 };
 
 // Features comparison data
-const proFeatures = [
-  {
-    icon: GitBranch,
-    title: "Llaves",
-    description: "Sistema visual de eliminatorias con cuadros dinámicos",
-  },
-  {
-    icon: Radio,
-    title: "Partidos en Vivo",
-    description: "Actualización de resultados en tiempo real",
-  },
-  {
-    icon: Medal,
-    title: "Ranking Integrado",
-    description: "Sistema de puntos y clasificación automática",
-  },
-  {
-    icon: Users,
-    title: "Gestión de Zonas",
-    description: "Fase de grupos con tablas de posiciones",
-  },
-];
+// const proFeatures = [
+//   {
+//     icon: GitBranch,
+//     title: "Llaves",
+//     description: "Sistema visual de eliminatorias con cuadros dinámicos",
+//   },
+//   {
+//     icon: Radio,
+//     title: "Partidos en Vivo",
+//     description: "Actualización de resultados en tiempo real",
+//   },
+//   {
+//     icon: Medal,
+//     title: "Ranking Integrado",
+//     description: "Sistema de puntos y clasificación automática",
+//   },
+//   {
+//     icon: Users,
+//     title: "Gestión de Zonas",
+//     description: "Fase de grupos con tablas de posiciones",
+//   },
+// ];
 
 export function TournamentsProList() {
   const [tournaments, setTournaments] =
@@ -108,7 +103,7 @@ export function TournamentsProList() {
   return (
     <div className="animate-in fade-in duration-500">
       {/* PRO Header */}
-      <div className="mb-8 p-6 rounded-2xl bg-gradient-to-r from-yellow-500/10 via-orange-500/10 to-yellow-500/10 border border-yellow-500/20">
+      {/* <div className="mb-8 p-6 rounded-2xl bg-gradient-to-r from-yellow-500/10 via-orange-500/10 to-yellow-500/10 border border-yellow-500/20">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-yellow-500/20 to-orange-500/20 flex items-center justify-center">
@@ -135,10 +130,10 @@ export function TournamentsProList() {
             Nuevo Torneo PRO
           </Link>
         </div>
-      </div>
+      </div> */}
 
       {/* PRO Features Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {proFeatures.map((feature, index) => (
           <div
             key={index}
@@ -157,7 +152,7 @@ export function TournamentsProList() {
             </div>
           </div>
         ))}
-      </div>
+      </div> */}
 
       {/* Live Matches Section */}
       {/* {liveMatches.length > 0 && (
@@ -230,7 +225,7 @@ export function TournamentsProList() {
           </div>
         </div>
       )} */}
-      <Separator className="mb-8" />
+      {/* <Separator className="mb-8" /> */}
       {/* Stats Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <div className="p-4 rounded-xl bg-slate-800/50 border border-white/5">

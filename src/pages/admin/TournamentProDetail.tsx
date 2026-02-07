@@ -21,7 +21,6 @@ import {
   Users,
   Trophy,
   Zap,
-  Info,
   Grid3X3,
   Award,
   Medal,
@@ -30,6 +29,8 @@ import {
   Swords,
   GitBranch,
   Plus,
+  Save,
+  ChevronDown,
 } from "lucide-react";
 import {
   Select,
@@ -180,6 +181,35 @@ export function TournamentProDetail() {
     set3Score2: "",
     status: "pendiente" as MatchStatus,
   });
+
+  // Description editing state
+  const [isEditingDescription, setIsEditingDescription] = useState(false);
+  const [editedDescription, setEditedDescription] = useState("");
+
+  // Category and Gender selector state
+  const [selectedCategory, setSelectedCategory] = useState<string>(
+    tournament.category,
+  );
+  const [selectedGender, setSelectedGender] = useState<string>(
+    tournament.gender,
+  );
+
+  // Collapsible sections state for matches
+  const [collapsedSections, setCollapsedSections] = useState<Set<string>>(
+    new Set(),
+  );
+
+  const toggleSection = (sectionId: string) => {
+    setCollapsedSections((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(sectionId)) {
+        newSet.delete(sectionId);
+      } else {
+        newSet.add(sectionId);
+      }
+      return newSet;
+    });
+  };
 
   const status = statusConfig[tournament.status];
 
@@ -467,16 +497,142 @@ export function TournamentProDetail() {
         </div>
       </div>
 
-      {/* Tabs */}
-      <Tabs defaultValue="info" className="space-y-6">
-        <TabsList className="w-full grid grid-cols-5 bg-slate-800/50 border border-white/5 p-1">
-          <TabsTrigger
-            value="info"
-            className="text-slate-300 data-[state=active]:bg-yellow-500/20 data-[state=active]:text-yellow-400"
-          >
-            <Info className="w-4 h-4 mr-2" />
-            Info
-          </TabsTrigger>
+      {/* Editable Description Section - BEFORE TABS */}
+      <div className="bg-slate-900 border border-white/5 rounded-xl p-6 mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-bold text-white">
+            Descripción del Torneo
+          </h3>
+          {!isEditingDescription && (
+            <button
+              onClick={() => {
+                setIsEditingDescription(true);
+                setEditedDescription(
+                  tournament.description ||
+                    "Torneo oficial de pádel organizado por la asociación deportiva. Participan las mejores parejas de la categoría en formato de zonas clasificatorias seguido de llaves eliminatorias.",
+                );
+              }}
+              className="flex items-center gap-2 px-3 py-1.5 text-sm bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-400 rounded-lg transition-colors cursor-pointer"
+            >
+              <Pencil className="w-3.5 h-3.5" />
+              Editar
+            </button>
+          )}
+        </div>
+
+        {isEditingDescription ? (
+          <div className="space-y-4">
+            <textarea
+              value={editedDescription}
+              onChange={(e) => setEditedDescription(e.target.value)}
+              rows={4}
+              className="w-full bg-slate-950 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/50 transition-all resize-none leading-relaxed"
+              placeholder="Describe el torneo..."
+            />
+            <div className="flex items-center gap-3 justify-end">
+              <button
+                onClick={() => {
+                  setIsEditingDescription(false);
+                  setEditedDescription("");
+                }}
+                className="px-4 py-2 text-sm text-slate-400 hover:text-white rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => {
+                  // TODO: Save description to backend
+                  console.log("Guardando descripción:", editedDescription);
+                  setIsEditingDescription(false);
+                }}
+                className="flex items-center gap-2 px-4 py-2 text-sm bg-yellow-500 hover:bg-yellow-400 text-slate-900 font-medium rounded-lg transition-colors cursor-pointer"
+              >
+                <Save className="w-4 h-4" />
+                Guardar
+              </button>
+            </div>
+          </div>
+        ) : (
+          <p className="text-slate-400 leading-relaxed">
+            {tournament.description ||
+              "Torneo oficial de pádel organizado por la asociación deportiva. Participan las mejores parejas de la categoría en formato de zonas clasificatorias seguido de llaves eliminatorias."}
+          </p>
+        )}
+      </div>
+
+      {/* Selector de Categoría y Género */}
+      <div className="mb-6 p-4 bg-slate-900/50 rounded-xl border border-white/10">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+          <span className="text-sm font-medium text-slate-400">
+            Seleccionar cuadro:
+          </span>
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Categoría Select */}
+            <Select
+              value={selectedCategory}
+              onValueChange={setSelectedCategory}
+            >
+              <SelectTrigger className="w-[120px] bg-slate-950 border-white/10 text-white h-10">
+                <SelectValue placeholder="Categoría" />
+              </SelectTrigger>
+              <SelectContent className="bg-slate-900 border-white/10">
+                {AVAILABLE_CATEGORIES.map((cat) => (
+                  <SelectItem
+                    key={cat}
+                    value={cat}
+                    className="text-white focus:bg-slate-800 focus:text-white"
+                  >
+                    {cat} Categoría
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {/* Género Select */}
+            <Select value={selectedGender} onValueChange={setSelectedGender}>
+              <SelectTrigger className="w-[140px] bg-slate-950 border-white/10 text-white h-10">
+                <SelectValue placeholder="Género" />
+              </SelectTrigger>
+              <SelectContent className="bg-slate-900 border-white/10">
+                <SelectItem
+                  value="masculino"
+                  className="text-white focus:bg-slate-800 focus:text-white"
+                >
+                  Masculino
+                </SelectItem>
+                <SelectItem
+                  value="femenino"
+                  className="text-white focus:bg-slate-800 focus:text-white"
+                >
+                  Femenino
+                </SelectItem>
+                <SelectItem
+                  value="mixto"
+                  className="text-white focus:bg-slate-800 focus:text-white"
+                >
+                  Mixto
+                </SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Badge mostrando selección actual */}
+            <div className="px-3 py-1.5 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+              <span className="text-sm font-medium text-yellow-400">
+                {selectedCategory} -{" "}
+                {selectedGender === "masculino"
+                  ? "Masculino"
+                  : selectedGender === "femenino"
+                    ? "Femenino"
+                    : "Mixto"}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Tabs - Sin la tab Info */}
+      <Tabs defaultValue="parejas" className="space-y-6">
+        <TabsList className="w-full grid grid-cols-4 bg-slate-800/50 border border-white/5 p-1">
           <TabsTrigger
             value="parejas"
             className="text-slate-300 data-[state=active]:bg-yellow-500/20 data-[state=active]:text-yellow-400"
@@ -506,93 +662,6 @@ export function TournamentProDetail() {
             Llaves
           </TabsTrigger>
         </TabsList>
-
-        {/* Info Tab */}
-        <TabsContent value="info">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
-              <div className="bg-slate-900 border border-white/5 rounded-xl p-6">
-                <h3 className="text-lg font-bold text-white mb-4">
-                  Descripción del Torneo
-                </h3>
-                <p className="text-slate-400 leading-relaxed">
-                  {tournament.description ||
-                    "Torneo oficial de pádel organizado por la asociación deportiva. Participan las mejores parejas de la categoría en formato de zonas clasificatorias seguido de llaves eliminatorias."}
-                </p>
-
-                <div className="mt-6 grid grid-cols-2 gap-4">
-                  <div className="p-4 rounded-lg bg-slate-800/50">
-                    <h4 className="text-sm font-semibold text-white mb-1">
-                      Formato
-                    </h4>
-                    <p className="text-sm text-slate-400">
-                      Fase de grupos + Eliminación directa
-                    </p>
-                  </div>
-                  <div className="p-4 rounded-lg bg-slate-800/50">
-                    <h4 className="text-sm font-semibold text-white mb-1">
-                      Categoría
-                    </h4>
-                    <p className="text-sm text-slate-400">
-                      {tournament.category} -{" "}
-                      {tournament.gender === "masculino"
-                        ? "Masculino"
-                        : tournament.gender === "femenino"
-                          ? "Femenino"
-                          : "Mixto"}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <div className="bg-slate-900 border border-white/5 rounded-xl p-6">
-                <h3 className="text-lg font-bold text-white mb-4">Resumen</h3>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-slate-400">
-                      Parejas Participantes
-                    </span>
-                    <span className="font-semibold text-white">
-                      {participatingPairs.length}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-slate-400">
-                      Total Inscriptas
-                    </span>
-                    <span className="font-semibold text-slate-400">
-                      {enrolled.length}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-slate-400">Zonas</span>
-                    <span className="font-semibold text-white">
-                      {tournament.zones?.length || 0}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-slate-400">
-                      Partidos Totales
-                    </span>
-                    <span className="font-semibold text-white">
-                      {allMatches.length + (tournament.bracket?.length || 0)}
-                    </span>
-                  </div>
-                  {tournament.prize && (
-                    <div className="flex items-center justify-between pt-4 border-t border-white/5">
-                      <span className="text-sm text-slate-400">Premio</span>
-                      <span className="text-lg font-bold text-yellow-400">
-                        {tournament.prize}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </TabsContent>
 
         {/* Parejas Tab (Management) */}
         <TabsContent value="parejas">
@@ -985,125 +1054,300 @@ export function TournamentProDetail() {
 
         {/* Partidos Tab */}
         <TabsContent value="partidos">
-          {allMatches.length > 0 ? (
-            <div className="space-y-6">
-              {tournament.zones?.map((zone) => (
-                <div key={zone.id}>
-                  <h3 className="text-lg font-bold text-white mb-4">
-                    {zone.name}
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {zone.matches.map((match) => (
-                      <div
-                        key={match.id}
-                        className="bg-slate-900 border border-white/5 rounded-xl p-4 hover:border-yellow-500/20 transition-all"
+          <div className="space-y-6">
+            {/* Partidos de Zonas */}
+            {allMatches.length > 0 && (
+              <div className="space-y-4">
+                <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                  <Grid3X3 className="w-5 h-5 text-yellow-400" />
+                  Partidos de Fase de Grupos
+                </h2>
+                {tournament.zones?.map((zone) => {
+                  const isCollapsed = collapsedSections.has(`zone-${zone.id}`);
+                  return (
+                    <div
+                      key={zone.id}
+                      className="bg-slate-900 border border-white/5 rounded-xl overflow-hidden"
+                    >
+                      <button
+                        onClick={() => toggleSection(`zone-${zone.id}`)}
+                        className="w-full flex items-center justify-between p-4 hover:bg-white/5 transition-colors cursor-pointer"
                       >
-                        <div className="flex items-center justify-between mb-3">
-                          <span
-                            className={`text-xs font-medium px-2 py-1 rounded ${
-                              match.status === "finalizado"
-                                ? "bg-slate-700 text-slate-300"
-                                : match.status === "en-juego"
-                                  ? "bg-red-500/10 text-red-400"
-                                  : "bg-blue-500/10 text-blue-400"
-                            }`}
-                          >
-                            {match.status === "finalizado"
-                              ? "Finalizado"
-                              : match.status === "en-juego"
-                                ? "En Juego"
-                                : "Pendiente"}
+                        <h3 className="text-lg font-bold text-white">
+                          {zone.name}
+                        </h3>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-slate-400">
+                            {zone.matches.length} partidos
                           </span>
-                          <div className="flex items-center gap-2">
-                            {match.court && (
-                              <span className="text-xs text-slate-400">
-                                {match.court}
-                              </span>
-                            )}
-                            {/* <button
-                              onClick={() => openEditMatchModal(match)}
-                              className="p-1.5 hover:bg-yellow-500/20 rounded-lg text-slate-400 hover:text-yellow-400 transition-colors cursor-pointer"
-                              title="Editar resultado"
+                          <ChevronDown
+                            className={`w-5 h-5 text-slate-400 transition-transform ${
+                              isCollapsed ? "" : "rotate-180"
+                            }`}
+                          />
+                        </div>
+                      </button>
+                      {!isCollapsed && (
+                        <div className="p-4 pt-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {zone.matches.map((match) => (
+                            <div
+                              key={match.id}
+                              className="bg-slate-800/50 border border-white/5 rounded-xl p-4 hover:border-yellow-500/20 transition-all"
                             >
-                              <Pencil className="w-3.5 h-3.5" />
-                            </button> */}
-                          </div>
-                        </div>
-
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <span className="text-white font-medium">
-                              {match.pair1.player1.lastName} /{" "}
-                              {match.pair1.player2.lastName}
-                            </span>
-                            <div className="flex gap-1">
-                              {match.score1?.map((set, i) => (
+                              <div className="flex items-center justify-between mb-3">
                                 <span
-                                  key={i}
-                                  className={`w-6 h-6 flex items-center justify-center rounded text-sm font-bold ${
-                                    set > (match.score2?.[i] ?? 0)
-                                      ? "bg-green-500/20 text-green-400"
-                                      : "bg-slate-700 text-slate-300"
+                                  className={`text-xs font-medium px-2 py-1 rounded ${
+                                    match.status === "finalizado"
+                                      ? "bg-slate-700 text-slate-300"
+                                      : match.status === "en-juego"
+                                        ? "bg-red-500/10 text-red-400"
+                                        : "bg-blue-500/10 text-blue-400"
                                   }`}
                                 >
-                                  {set}
+                                  {match.status === "finalizado"
+                                    ? "Finalizado"
+                                    : match.status === "en-juego"
+                                      ? "En Juego"
+                                      : "Pendiente"}
                                 </span>
-                              ))}
-                            </div>
-                          </div>
+                                {match.court && (
+                                  <span className="text-xs text-slate-400">
+                                    {match.court}
+                                  </span>
+                                )}
+                              </div>
 
-                          <div className="flex items-center justify-between">
-                            <span className="text-white font-medium">
-                              {match.pair2.player1.lastName} /{" "}
-                              {match.pair2.player2.lastName}
-                            </span>
-                            <div className="flex gap-1">
-                              {match.score2?.map((set, i) => (
-                                <span
-                                  key={i}
-                                  className={`w-6 h-6 flex items-center justify-center rounded text-sm font-bold ${
-                                    set > (match.score1?.[i] ?? 0)
-                                      ? "bg-green-500/20 text-green-400"
-                                      : "bg-slate-700 text-slate-300"
-                                  }`}
+                              <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                  <span className="text-white font-medium">
+                                    {match.pair1.player1.lastName} /{" "}
+                                    {match.pair1.player2.lastName}
+                                  </span>
+                                  <div className="flex gap-1">
+                                    {match.score1?.map((set, i) => (
+                                      <span
+                                        key={i}
+                                        className={`w-6 h-6 flex items-center justify-center rounded text-sm font-bold ${
+                                          set > (match.score2?.[i] ?? 0)
+                                            ? "bg-green-500/20 text-green-400"
+                                            : "bg-slate-700 text-slate-300"
+                                        }`}
+                                      >
+                                        {set}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+
+                                <div className="flex items-center justify-between">
+                                  <span className="text-white font-medium">
+                                    {match.pair2.player1.lastName} /{" "}
+                                    {match.pair2.player2.lastName}
+                                  </span>
+                                  <div className="flex gap-1">
+                                    {match.score2?.map((set, i) => (
+                                      <span
+                                        key={i}
+                                        className={`w-6 h-6 flex items-center justify-center rounded text-sm font-bold ${
+                                          set > (match.score1?.[i] ?? 0)
+                                            ? "bg-green-500/20 text-green-400"
+                                            : "bg-slate-700 text-slate-300"
+                                        }`}
+                                      >
+                                        {set}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="mt-4 w-full bg-transparent text-white"
+                                  onClick={() => openEditMatchModal(match)}
                                 >
-                                  {set}
-                                </span>
-                              ))}
+                                  {match.status === "pendiente" ? (
+                                    <Plus className="mr-2 h-3 w-3" />
+                                  ) : (
+                                    <Pencil className="mr-2 h-3 w-3" />
+                                  )}
+                                  {match.status === "pendiente"
+                                    ? "Cargar"
+                                    : "Editar"}
+                                </Button>
+                              </div>
                             </div>
-                          </div>
-
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="mt-4 w-full bg-transparent text-white"
-                            onClick={() => openEditMatchModal(match)}
-                          >
-                            {match.status === "pendiente" ? (
-                              <Plus className="mr-2 h-3 w-3" />
-                            ) : (
-                              <Pencil className="mr-2 h-3 w-3" />
-                            )}
-                            {match.status === "pendiente" ? "Cargar" : "Editar"}
-                          </Button>
+                          ))}
                         </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Partidos de Llaves Eliminatorias */}
+            {tournament.bracket && tournament.bracket.length > 0 && (
+              <div className="space-y-4">
+                <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                  <GitBranch className="w-5 h-5 text-yellow-400" />
+                  Partidos de Llaves Eliminatorias
+                </h2>
+                {Array.from(new Set(tournament.bracket.map((m) => m.round)))
+                  .sort((a, b) => a - b)
+                  .map((round) => {
+                    const roundMatches = tournament.bracket!.filter(
+                      (m) => m.round === round,
+                    );
+                    const roundName =
+                      round === 1
+                        ? "Cuartos de Final"
+                        : round === 2
+                          ? "Semifinales"
+                          : "Final";
+                    const isCollapsed = collapsedSections.has(
+                      `bracket-${round}`,
+                    );
+
+                    return (
+                      <div
+                        key={round}
+                        className="bg-slate-900 border border-white/5 rounded-xl overflow-hidden"
+                      >
+                        <button
+                          onClick={() => toggleSection(`bracket-${round}`)}
+                          className="w-full flex items-center justify-between p-4 hover:bg-white/5 transition-colors cursor-pointer"
+                        >
+                          <h3 className="text-lg font-bold text-yellow-400">
+                            {roundName}
+                          </h3>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm text-slate-400">
+                              {roundMatches.length} partidos
+                            </span>
+                            <ChevronDown
+                              className={`w-5 h-5 text-slate-400 transition-transform ${
+                                isCollapsed ? "" : "rotate-180"
+                              }`}
+                            />
+                          </div>
+                        </button>
+                        {!isCollapsed && (
+                          <div className="p-4 pt-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {roundMatches.map((match) => (
+                              <div
+                                key={match.id}
+                                className="bg-slate-800/50 border border-white/5 rounded-xl p-4 hover:border-yellow-500/20 transition-all"
+                              >
+                                <div className="flex items-center justify-between mb-3">
+                                  <span
+                                    className={`text-xs font-medium px-2 py-1 rounded ${
+                                      match.status === "finalizado"
+                                        ? "bg-slate-700 text-slate-300"
+                                        : match.status === "en-juego"
+                                          ? "bg-red-500/10 text-red-400"
+                                          : "bg-blue-500/10 text-blue-400"
+                                    }`}
+                                  >
+                                    {match.status === "finalizado"
+                                      ? "Finalizado"
+                                      : match.status === "en-juego"
+                                        ? "En Juego"
+                                        : "Pendiente"}
+                                  </span>
+                                </div>
+
+                                <div className="space-y-2">
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-white font-medium">
+                                      {match.pair1
+                                        ? `${match.pair1.player1.lastName} / ${match.pair1.player2.lastName}`
+                                        : "Por definir"}
+                                    </span>
+                                    <div className="flex gap-1">
+                                      {match.score1?.map((set, i) => (
+                                        <span
+                                          key={i}
+                                          className={`w-6 h-6 flex items-center justify-center rounded text-sm font-bold ${
+                                            set > (match.score2?.[i] ?? 0)
+                                              ? "bg-green-500/20 text-green-400"
+                                              : "bg-slate-700 text-slate-300"
+                                          }`}
+                                        >
+                                          {set}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  </div>
+
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-white font-medium">
+                                      {match.pair2
+                                        ? `${match.pair2.player1.lastName} / ${match.pair2.player2.lastName}`
+                                        : "Por definir"}
+                                    </span>
+                                    <div className="flex gap-1">
+                                      {match.score2?.map((set, i) => (
+                                        <span
+                                          key={i}
+                                          className={`w-6 h-6 flex items-center justify-center rounded text-sm font-bold ${
+                                            set > (match.score1?.[i] ?? 0)
+                                              ? "bg-green-500/20 text-green-400"
+                                              : "bg-slate-700 text-slate-300"
+                                          }`}
+                                        >
+                                          {set}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  </div>
+
+                                  {match.pair1 && match.pair2 && (
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      className="mt-4 w-full bg-transparent text-white"
+                                      onClick={() =>
+                                        openEditMatchModal(
+                                          match as unknown as Match,
+                                        )
+                                      }
+                                    >
+                                      {match.status === "pendiente" ? (
+                                        <Plus className="mr-2 h-3 w-3" />
+                                      ) : (
+                                        <Pencil className="mr-2 h-3 w-3" />
+                                      )}
+                                      {match.status === "pendiente"
+                                        ? "Cargar"
+                                        : "Editar"}
+                                    </Button>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
-                    ))}
-                  </div>
+                    );
+                  })}
+              </div>
+            )}
+
+            {/* Empty State */}
+            {allMatches.length === 0 &&
+              (!tournament.bracket || tournament.bracket.length === 0) && (
+                <div className="bg-slate-900 border border-white/5 rounded-xl p-12 text-center">
+                  <Swords className="w-12 h-12 text-slate-600 mx-auto mb-4" />
+                  <p className="text-lg font-medium text-white">
+                    No hay partidos programados
+                  </p>
+                  <p className="text-sm text-slate-400 mt-1">
+                    Los partidos se crearán cuando comience el torneo
+                  </p>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="bg-slate-900 border border-white/5 rounded-xl p-12 text-center">
-              <Swords className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-              <p className="text-lg font-medium text-white">
-                No hay partidos programados
-              </p>
-              <p className="text-sm text-slate-400 mt-1">
-                Los partidos se crearán cuando comience el torneo
-              </p>
-            </div>
-          )}
+              )}
+          </div>
         </TabsContent>
 
         {/* Llaves Tab */}
