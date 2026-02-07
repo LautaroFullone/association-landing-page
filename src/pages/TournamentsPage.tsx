@@ -525,15 +525,6 @@ export function TournamentsPage() {
     setSelectedGender("all");
   };
 
-  // Stats
-  const stats = {
-    total: mockTournaments.length,
-    enCurso: mockTournaments.filter((t) => t.status === "en-curso").length,
-    abiertas: mockTournaments.filter(
-      (t) => t.status === "inscripciones-abiertas",
-    ).length,
-  };
-
   // Modal handlers
   const handleRegistration = (tournament: Tournament) => {
     setSelectedTournament(tournament);
