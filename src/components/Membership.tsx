@@ -2,7 +2,6 @@ import { useState } from "react";
 import {
   ArrowRight,
   Check,
-  Upload,
   User,
   MapPin,
   Phone,
@@ -61,11 +60,11 @@ export function Membership() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFormData((prev) => ({ ...prev, foto: e.target.files![0] }));
-    }
-  };
+  //   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //     if (e.target.files && e.target.files[0]) {
+  //       setFormData((prev) => ({ ...prev, foto: e.target.files![0] }));
+  //     }
+  //   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -420,7 +419,7 @@ export function Membership() {
                           </div>
                         </div>
 
-                        <div className="space-y-2">
+                        {/* <div className="space-y-2">
                           <Label htmlFor="foto" className="text-slate-300">
                             Foto para Credencial
                           </Label>
@@ -456,7 +455,7 @@ export function Membership() {
                               seleccionado: {formData.foto.name}
                             </p>
                           )}
-                        </div>
+                        </div> */}
                       </div>
 
                       <Button
