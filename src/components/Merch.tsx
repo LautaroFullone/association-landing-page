@@ -27,7 +27,7 @@ export function Merch() {
   return (
     <section
       id="merch"
-      className="py-32 bg-slate-900 relative overflow-hidden scroll-mt-20"
+      className="py-24 bg-slate-900 relative overflow-hidden scroll-mt-20"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="rounded-3xl bg-slate-950 border border-white/5 overflow-hidden relative">

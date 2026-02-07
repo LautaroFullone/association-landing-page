@@ -6,11 +6,11 @@ import {
   Users,
   Trophy,
   Award,
-  Medal,
   UserCheck,
   Swords,
   Grid3X3,
   GitBranch,
+  Check,
 } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -26,76 +26,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-// Types
-interface Player {
-  name: string;
-  lastName: string;
-}
-
-interface Pair {
-  id: string;
-  player1: Player;
-  player2: Player;
-  ranking?: number;
-  points?: number;
-  wins?: number;
-  losses?: number;
-  setsWon?: number;
-  setsLost?: number;
-  gamesWon?: number;
-  gamesLost?: number;
-}
-
-interface Match {
-  id: string;
-  pair1: Pair;
-  pair2: Pair;
-  score?: {
-    set1: { pair1: number; pair2: number };
-    set2: { pair1: number; pair2: number };
-    set3?: { pair1: number; pair2: number };
-  };
-  status: "pending" | "in-progress" | "finished";
-  date?: string;
-  time?: string;
-  court?: string;
-}
-
-interface Zone {
-  id: string;
-  name: string;
-  pairs: Pair[];
-  matches: Match[];
-}
-
-// Subtorneo = combinación de categoría + género
-interface Subtournament {
-  category: string;
-  gender: "masculino" | "femenino" | "mixto";
-  zones: Zone[];
-  bracket: Match[];
-  champion?: Pair;
-  runnerUp?: Pair;
-  semifinalists?: Pair[];
-}
-
-interface Tournament {
-  id: string;
-  name: string;
-  startDate: string;
-  endDate: string;
-  location: string;
-  categories: string[];
-  genders: ("masculino" | "femenino" | "mixto")[];
-  status: "inscripciones-abiertas" | "en-curso" | "proximo" | "finalizado";
-  prize?: string;
-  // Rich text content - supports basic HTML: <strong>, <ul>, <li>, <br>
-  content?: string;
-  subtournaments: Subtournament[];
-}
+import type {
+  Tournament,
+  Zone,
+  Match,
+  BracketRound,
+  BracketMatch,
+} from "@/types/tournament";
+// import { statusConfig, genderLabels } from "@/types/tournament"; // Re-adding as separate import line if needed by linter logic, but wait...
+import { mockTournamentOctavos } from "@/data/mockTournamentOctavos";
 
 // Mock Data
-const mockTournament: Tournament = {
+const mockTournamentEnCurso: Tournament = {
   id: "1",
   name: "Torneo Apertura 2026",
   startDate: "2026-02-15",
@@ -331,7 +273,7 @@ const mockTournament: Tournament = {
                 player1: { name: "Federico", lastName: "Molina" },
                 player2: { name: "Esteban", lastName: "Aguirre" },
               },
-              status: "in-progress",
+              status: "pending",
               date: "2026-02-16",
               time: "10:00",
               court: "Cancha 1",
@@ -424,25 +366,7 @@ const mockTournament: Tournament = {
           ],
         },
       ],
-      bracket: [
-        {
-          id: "b1",
-          pair1: {
-            id: "p1",
-            player1: { name: "Martín", lastName: "García" },
-            player2: { name: "Lucas", lastName: "Fernández" },
-          },
-          pair2: {
-            id: "p6",
-            player1: { name: "Pablo", lastName: "Díaz" },
-            player2: { name: "Nicolás", lastName: "Castro" },
-          },
-          status: "pending",
-          date: "2026-02-19",
-          time: "16:00",
-          court: "Cancha 1",
-        },
-      ],
+      bracket: [],
     },
     // 4ta Femenino
     {
@@ -892,107 +816,180 @@ const genderLabels: Record<string, string> = {
 // Match Card Component
 function MatchCard({ match }: { match: Match }) {
   const isFinished = match.status === "finished";
-  const isInProgress = match.status === "in-progress";
+
+  // Determine winner based on sets won
+  const getWinner = () => {
+    if (!isFinished || !match.score) return null;
+
+    let pair1Sets = 0;
+    let pair2Sets = 0;
+
+    if (match.score.set1.pair1 > match.score.set1.pair2) pair1Sets++;
+    else if (match.score.set1.pair2 > match.score.set1.pair1) pair2Sets++;
+
+    if (match.score.set2.pair1 > match.score.set2.pair2) pair1Sets++;
+    else if (match.score.set2.pair2 > match.score.set2.pair1) pair2Sets++;
+
+    if (match.score.set3) {
+      if (match.score.set3.pair1 > match.score.set3.pair2) pair1Sets++;
+      else if (match.score.set3.pair2 > match.score.set3.pair1) pair2Sets++;
+    }
+
+    if (pair1Sets > pair2Sets) return 1;
+    if (pair2Sets > pair1Sets) return 2;
+    return null;
+  };
+
+  const winner = getWinner();
+  const pair1Won = winner === 1;
+  const pair2Won = winner === 2;
+
+  // Get scores as array for easier mapping
+  const getScores = (pairNum: 1 | 2) => {
+    if (!match.score) return [];
+    const scores = [
+      pairNum === 1 ? match.score.set1.pair1 : match.score.set1.pair2,
+      pairNum === 1 ? match.score.set2.pair1 : match.score.set2.pair2,
+    ];
+    if (match.score.set3) {
+      scores.push(
+        pairNum === 1 ? match.score.set3.pair1 : match.score.set3.pair2,
+      );
+    }
+    return scores;
+  };
+
+  const pair1Scores = getScores(1);
+  const pair2Scores = getScores(2);
+
+  const matchStatusConfig = {
+    finished: {
+      label: "Finalizado",
+      className: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
+    },
+    pending: {
+      label: "Pendiente",
+      className: "bg-slate-700/50 text-slate-400 border-slate-600/30",
+    },
+  };
+
+  const status = matchStatusConfig[match.status];
 
   return (
-    <Card className="border-white/10 bg-slate-900/50  overflow-hidden">
-      <CardContent className="p-4">
-        {/* Match Header */}
-        <div className="flex items-center justify-between mb-3">
+    <Card className="border-white/10 bg-slate-900/50 overflow-hidden p-0">
+      <CardContent className="p-0">
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-white/10 bg-slate-800/50 px-4 py-2">
           <div className="flex items-center gap-2">
-            {match.date && (
-              <span className="text-xs text-slate-400">
-                {formatShortDate(match.date)}
+            <Badge className={status.className}>{status.label}</Badge>
+          </div>
+          <div className="flex items-center gap-4 text-xs text-slate-400">
+            {match.date && <span>{formatShortDate(match.date)}</span>}
+            {match.time && <span>{match.time}</span>}
+            {match.court && (
+              <span className="flex items-center gap-1">
+                <MapPin className="h-3 w-3" />
+                {match.court}
               </span>
             )}
-            {match.time && (
-              <span className="text-xs text-slate-500">{match.time}</span>
+          </div>
+        </div>
+
+        {/* Match Content */}
+        <div className="p-4">
+          {/* Pair 1 */}
+          <div
+            className={`flex items-center justify-between rounded-lg p-3 transition-colors ${
+              pair1Won ? "bg-emerald-500/10" : "bg-transparent"
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              {pair1Won && (
+                <span className="p-1 flex  items-center justify-center rounded-full bg-emerald-500 text-xs font-bold text-white">
+                  <Check className=" size-4" />
+                </span>
+              )}
+              <div>
+                <p
+                  className={`font-medium ${pair1Won ? "text-emerald-400" : "text-white"}`}
+                >
+                  {match.pair1.player1.name} {match.pair1.player1.lastName}
+                </p>
+                <p
+                  className={`font-medium ${pair1Won ? "text-emerald-400/80" : "text-white"}`}
+                >
+                  {match.pair1.player2.name} {match.pair1.player2.lastName}
+                </p>
+              </div>
+            </div>
+            {pair1Scores.length > 0 && (
+              <div className="flex items-center gap-1">
+                {pair1Scores.map((score, index) => (
+                  <span
+                    key={index}
+                    className={`flex h-9 w-9 items-center justify-center rounded text-lg font-bold ${
+                      score > (pair2Scores[index] ?? 0)
+                        ? "bg-emerald-600 text-white"
+                        : "bg-slate-700 text-slate-300"
+                    }`}
+                  >
+                    {score}
+                  </span>
+                ))}
+              </div>
             )}
           </div>
-          {match.court && (
-            <Badge
-              variant="outline"
-              className="text-xs border-white/10 text-slate-400"
-            >
-              {match.court}
-            </Badge>
-          )}
-        </div>
 
-        {/* Pair 1 */}
-        <div
-          className={`flex items-center justify-between p-2 rounded-lg mb-2 ${
-            isFinished && match.score
-              ? match.score.set1.pair1 > match.score.set1.pair2
-                ? "bg-green-500/10"
-                : "bg-slate-800/50"
-              : "bg-slate-800/50"
-          }`}
-        >
-          <span className="text-sm font-medium text-white">
-            {match.pair1.player1.lastName} / {match.pair1.player2.lastName}
-          </span>
-          {isFinished && match.score && (
-            <div className="flex gap-2">
-              <span className="text-sm font-bold text-white w-5 text-center">
-                {match.score.set1.pair1}
-              </span>
-              <span className="text-sm font-bold text-white w-5 text-center">
-                {match.score.set2.pair1}
-              </span>
-              {match.score.set3 && (
-                <span className="text-sm font-bold text-white w-5 text-center">
-                  {match.score.set3.pair1}
-                </span>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Pair 2 */}
-        <div
-          className={`flex items-center justify-between p-2 rounded-lg ${
-            isFinished && match.score
-              ? match.score.set1.pair2 > match.score.set1.pair1
-                ? "bg-green-500/10"
-                : "bg-slate-800/50"
-              : "bg-slate-800/50"
-          }`}
-        >
-          <span className="text-sm font-medium text-white">
-            {match.pair2.player1.lastName} / {match.pair2.player2.lastName}
-          </span>
-          {isFinished && match.score && (
-            <div className="flex gap-2">
-              <span className="text-sm font-bold text-white w-5 text-center">
-                {match.score.set1.pair2}
-              </span>
-              <span className="text-sm font-bold text-white w-5 text-center">
-                {match.score.set2.pair2}
-              </span>
-              {match.score.set3 && (
-                <span className="text-sm font-bold text-white w-5 text-center">
-                  {match.score.set3.pair2}
-                </span>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Status */}
-        {!isFinished && (
-          <div className="mt-3 text-center">
-            <Badge
-              className={
-                isInProgress
-                  ? "bg-amber-500/20 text-amber-400 border-amber-500/30"
-                  : "bg-slate-700 text-slate-300 border-slate-600"
-              }
-            >
-              {isInProgress ? "En juego" : "Pendiente"}
-            </Badge>
+          {/* VS Divider */}
+          <div className="my-2 flex items-center gap-3">
+            <div className="h-px flex-1 bg-white/10" />
+            <span className="text-xs font-medium text-slate-500">vs</span>
+            <div className="h-px flex-1 bg-white/10" />
           </div>
-        )}
+
+          {/* Pair 2 */}
+          <div
+            className={`flex items-center justify-between rounded-lg p-3 transition-colors ${
+              pair2Won ? "bg-emerald-500/10" : "bg-transparent"
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              {pair2Won && (
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 text-xs font-bold text-white">
+                  W
+                </span>
+              )}
+              <div>
+                <p
+                  className={`font-medium ${pair2Won ? "text-emerald-400" : "text-white"}`}
+                >
+                  {match.pair2.player1.name} {match.pair2.player1.lastName}
+                </p>
+                <p
+                  className={`font-medium ${pair2Won ? "text-emerald-400/80" : "text-white"}`}
+                >
+                  {match.pair2.player2.name} {match.pair2.player2.lastName}
+                </p>
+              </div>
+            </div>
+            {pair2Scores.length > 0 && (
+              <div className="flex items-center gap-1">
+                {pair2Scores.map((score, index) => (
+                  <span
+                    key={index}
+                    className={`flex h-9 w-9 items-center justify-center rounded text-lg font-bold ${
+                      score > (pair1Scores[index] ?? 0)
+                        ? "bg-emerald-600 text-white"
+                        : "bg-slate-700 text-slate-300"
+                    }`}
+                  >
+                    {score}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
       </CardContent>
     </Card>
   );
@@ -1010,7 +1007,7 @@ function ZoneTable({ zone }: { zone: Zone }) {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-white/10">
-                <th className="text-left py-2 px-2 text-slate-400 font-medium">
+                <th className="text-left py-2 px-2 text-slate-400 font-medium pl-4">
                   #
                 </th>
                 <th className="text-left py-2 px-2 text-slate-400 font-medium">
@@ -1026,7 +1023,10 @@ function ZoneTable({ zone }: { zone: Zone }) {
                   P
                 </th>
                 <th className="text-center py-2 px-2 text-slate-400 font-medium">
-                  Sets
+                  SG
+                </th>
+                <th className="text-center py-2 px-2 text-slate-400 font-medium">
+                  SP
                 </th>
                 <th className="text-center py-2 px-2 text-slate-400 font-medium">
                   Pts
@@ -1039,13 +1039,22 @@ function ZoneTable({ zone }: { zone: Zone }) {
                 .map((pair, index) => (
                   <tr
                     key={pair.id}
-                    className={`border-b border-white/5 ${
-                      index < 2 ? "bg-blue-500/5" : ""
+                    className={`border-b border-white/5 relative group ${
+                      index < 2
+                        ? "bg-emerald-500/5 hover:bg-emerald-500/10"
+                        : "hover:bg-white/5 "
                     }`}
                   >
-                    <td className="py-3 px-2 text-slate-400">{index + 1}</td>
+                    <td className="py-3 px-2 pl-4 text-slate-400 relative">
+                      {index < 2 && (
+                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
+                      )}
+                      {index + 1}
+                    </td>
                     <td className="py-3 px-2">
-                      <span className="font-medium text-white">
+                      <span
+                        className={`font-medium ${index < 2 ? "text-emerald-100" : "text-white"}`}
+                      >
                         {pair.player1.lastName} / {pair.player2.lastName}
                       </span>
                     </td>
@@ -1058,33 +1067,896 @@ function ZoneTable({ zone }: { zone: Zone }) {
                     <td className="py-3 px-2 text-center text-red-400">
                       {pair.losses || 0}
                     </td>
-                    <td className="py-3 px-2 text-center text-slate-300">
-                      {pair.setsWon || 0}-{pair.setsLost || 0}
+                    <td className="py-3 px-2 text-center text-green-400">
+                      {pair.setsWon || 0}
                     </td>
-                    <td className="py-3 px-2 text-center font-bold text-blue-400">
-                      {pair.points || 0}
+                    <td className="py-3 px-2 text-center text-red-400">
+                      {pair.setsLost || 0}
+                    </td>
+                    <td className="py-3 px-2 text-center">
+                      <span
+                        className={`inline-flex items-center justify-center h-7 w-7 rounded font-bold ${
+                          index < 2
+                            ? "bg-emerald-500/20 text-emerald-400"
+                            : "bg-blue-600/20 text-blue-400"
+                        }`}
+                      >
+                        {pair.points || 0}
+                      </span>
                     </td>
                   </tr>
                 ))}
             </tbody>
           </table>
+          <div className="mt-3 flex items-center gap-2 px-2 text-xs text-slate-400">
+            <div className="h-2 w-2 rounded-full bg-emerald-500" />
+            <span>Los 2 primeros clasifican a la siguiente ronda</span>
+          </div>
         </div>
       </CardContent>
     </Card>
   );
 }
 
+// Bracket Match Card Component
+function BracketMatchCard({ match }: { match: BracketMatch }) {
+  const winner = match.winner;
+  const pair1Won = winner === 1;
+  const pair2Won = winner === 2;
+
+  // Get scores for display
+  const getScores = (pairNum: 1 | 2) => {
+    if (!match.score) return [];
+    const scores = [
+      pairNum === 1 ? match.score.set1?.pair1 : match.score.set1?.pair2,
+      pairNum === 1 ? match.score.set2?.pair1 : match.score.set2?.pair2,
+    ];
+    if (match.score.set3) {
+      scores.push(
+        pairNum === 1 ? match.score.set3.pair1 : match.score.set3.pair2,
+      );
+    }
+    return scores.filter((s) => s !== undefined) as number[];
+  };
+
+  const pair1Scores = getScores(1);
+  const pair2Scores = getScores(2);
+
+  return (
+    <Card className="w-64 shrink-0 rounded-lg border-white/10 bg-slate-900/50 shadow-sm overflow-hidden p-0 relative group hover:border-white/20 transition-colors">
+      {/* Status line on left */}
+      <div
+        className={`absolute left-0 top-0 bottom-0 w-1 ${
+          match.status === "finished" ? "bg-emerald-500" : "bg-slate-700"
+        }`}
+      />
+
+      <div className="p-2 pl-3">
+        {/* Header: Date & Time */}
+        <div className="mb-2 flex items-center justify-between text-[10px] text-slate-400">
+          <span>
+            {match.date ? formatShortDate(match.date) : "TBD"} •{" "}
+            {match.time || "TBD"}
+          </span>
+          {match.court && (
+            <span className="flex items-center gap-0.5">
+              <MapPin className="h-2.5 w-2.5" /> {match.court}
+            </span>
+          )}
+        </div>
+
+        {/* Pair 1 */}
+        <div
+          className={`flex items-center justify-between rounded p-1.5 ${pair1Won ? "bg-emerald-500/10" : ""}`}
+        >
+          <div className="flex items-center gap-2 overflow-hidden">
+            {pair1Won && <Check className="text-emerald-400 size-4" />}
+            <div
+              className={`truncate text-sm ${pair1Won ? "font-medium text-emerald-400" : "text-slate-300"}`}
+            >
+              {match.pair1 ? (
+                <span>
+                  <span className="font-medium text-white">
+                    {match.pair1.player1.lastName}
+                  </span>
+                  / {match.pair1.player2.lastName}
+                </span>
+              ) : (
+                <span className="text-slate-600 italic">Por definir</span>
+              )}
+            </div>
+          </div>
+          {pair1Scores.length > 0 && (
+            <div className="flex gap-1">
+              {pair1Scores.map((score, i) => (
+                <span
+                  key={i}
+                  className={`flex h-5 w-5 items-center justify-center rounded text-[10px] font-bold ${
+                    score > (pair2Scores[i] ?? -1)
+                      ? "bg-emerald-600 text-white"
+                      : "bg-slate-800 text-slate-400"
+                  }`}
+                >
+                  {score}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Pair 2 */}
+        <div
+          className={`mt-1 flex items-center justify-between rounded p-1.5 ${pair2Won ? "bg-emerald-500/10" : ""}`}
+        >
+          <div className="flex items-center gap-2 overflow-hidden">
+            {pair2Won && <Check className="text-emerald-400 size-4" />}
+
+            <div
+              className={`truncate text-sm ${pair2Won ? "font-medium text-emerald-400" : "text-slate-300"}`}
+            >
+              {match.pair2 ? (
+                <span>
+                  <span className="font-medium text-white">
+                    {match.pair2.player1.lastName}
+                  </span>
+                  / {match.pair2.player2.lastName}
+                </span>
+              ) : (
+                <span className="text-slate-600 italic">Por definir</span>
+              )}
+            </div>
+          </div>
+          {pair2Scores.length > 0 && (
+            <div className="flex gap-1">
+              {pair2Scores.map((score, i) => (
+                <span
+                  key={i}
+                  className={`flex h-5 w-5 items-center justify-center rounded text-[10px] font-bold ${
+                    score > (pair1Scores[i] ?? -1)
+                      ? "bg-emerald-600 text-white"
+                      : "bg-slate-800 text-slate-400"
+                  }`}
+                >
+                  {score}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+// Bracket View Component
+function BracketView({ rounds }: { rounds: BracketRound[] }) {
+  if (!rounds || rounds.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-slate-500">
+        <GitBranch className="h-12 w-12 mb-4 opacity-50" />
+        <p>Las llaves aún no han sido generadas</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative w-full overflow-x-auto pb-8 pt-4">
+      {" "}
+      {/* Scroll container */}
+      <div className="flex min-w-max gap-8 px-4">
+        {rounds.map((round, roundIndex) => (
+          <div key={round.id} className="flex flex-col">
+            <div className="mb-4 text-center">
+              <Badge className="bg-blue-600/20 text-blue-400 border-blue-500/30 text-sm px-4 py-1">
+                {round.name}
+              </Badge>
+            </div>
+            <div
+              className={`flex flex-1 flex-col justify-center ${
+                roundIndex === 0 ? "gap-6" : "gap-32"
+              }`}
+            >
+              {" "}
+              {/* Using justify-center with specific gaps allows for precise connector lines */}
+              {round.matches.map((match, matchIndex) => (
+                <div key={match.id} className="relative flex items-center">
+                  <BracketMatchCard match={match} />
+
+                  {/* Connector Lines */}
+                  {roundIndex < rounds.length - 1 && (
+                    <>
+                      {/* Horizontal line exiting right */}
+                      <div className="absolute -right-4 top-1/2 h-px w-4 bg-slate-700" />
+
+                      {/* Vertical Connectors meeting in the middle */}
+                      {matchIndex % 2 === 0 ? (
+                        // Even match: Line DOWN
+                        <div
+                          className="absolute -right-4 top-1/2 w-px bg-slate-700"
+                          style={{
+                            height:
+                              roundIndex === 0
+                                ? "calc(50% + 0.75rem)"
+                                : "calc(50% + 4rem)",
+                          }}
+                        />
+                      ) : (
+                        // Odd match: Line UP
+                        <div
+                          className="absolute -right-4 bottom-1/2 w-px bg-slate-700"
+                          style={{
+                            height:
+                              roundIndex === 0
+                                ? "calc(50% + 0.75rem)"
+                                : "calc(50% + 4rem)",
+                          }}
+                        />
+                      )}
+                    </>
+                  )}
+
+                  {/* Incoming stub from left */}
+                  {roundIndex > 0 && (
+                    <div className="absolute -left-4 top-1/2 h-px w-4 bg-slate-700" />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const mockTournamentFinalizado: Tournament = {
+  id: "7",
+  name: "Torneo Clausura 2025",
+  startDate: "2025-11-15",
+  endDate: "2025-11-22",
+  location: "Club Náutico Mar del Plata",
+  categories: ["4ta"],
+  genders: ["masculino"],
+  status: "finalizado",
+  prize: "$200.000 + Trofeos",
+  content: `
+    <p>Torneo Clausura finalizado con éxito.</p>
+    <p>¡Felicitaciones a los campeones!</p>
+  `,
+  subtournaments: [
+    {
+      category: "4ta",
+      gender: "masculino",
+      zones: [
+        {
+          id: "z1",
+          name: "Zona A",
+          matches: [
+            {
+              id: "z1m1",
+              pair1: {
+                id: "p1",
+                player1: { name: "Juan", lastName: "Pérez" },
+                player2: { name: "Carlos", lastName: "López" },
+              },
+              pair2: {
+                id: "p4",
+                player1: { name: "Lucas", lastName: "Morales" },
+                player2: { name: "Mateo", lastName: "Sánchez" },
+              },
+              score: {
+                set1: { pair1: 6, pair2: 4 },
+                set2: { pair1: 7, pair2: 5 },
+              },
+              status: "finished",
+              date: "2025-11-15",
+              time: "10:00",
+              court: "Cancha 1",
+            },
+            {
+              id: "z1m2",
+              pair1: {
+                id: "p4",
+                player1: { name: "Lucas", lastName: "Morales" },
+                player2: { name: "Mateo", lastName: "Sánchez" },
+              },
+              pair2: {
+                id: "p90",
+                player1: { name: "Andrés", lastName: "Ferrer" },
+                player2: { name: "Martín", lastName: "Sosa" },
+              },
+              score: {
+                set1: { pair1: 6, pair2: 2 },
+                set2: { pair1: 6, pair2: 1 },
+              },
+              status: "finished",
+              date: "2025-11-15",
+              time: "14:00",
+              court: "Cancha 2",
+            },
+            {
+              id: "z1m3",
+              pair1: {
+                id: "p1",
+                player1: { name: "Juan", lastName: "Pérez" },
+                player2: { name: "Carlos", lastName: "López" },
+              },
+              pair2: {
+                id: "p90",
+                player1: { name: "Andrés", lastName: "Ferrer" },
+                player2: { name: "Martín", lastName: "Sosa" },
+              },
+              score: {
+                set1: { pair1: 6, pair2: 0 },
+                set2: { pair1: 6, pair2: 1 },
+              },
+              status: "finished",
+              date: "2025-11-16",
+              time: "10:00",
+              court: "Cancha 1",
+            },
+          ],
+          pairs: [
+            {
+              id: "p1",
+              player1: { name: "Juan", lastName: "Pérez" },
+              player2: { name: "Carlos", lastName: "López" },
+              points: 9,
+              wins: 2,
+              losses: 0,
+              setsWon: 4,
+              setsLost: 0,
+            },
+            {
+              id: "p4",
+              player1: { name: "Lucas", lastName: "Morales" },
+              player2: { name: "Mateo", lastName: "Sánchez" },
+              points: 6,
+              wins: 1,
+              losses: 1,
+              setsWon: 2,
+              setsLost: 2,
+            },
+            {
+              id: "p90",
+              player1: { name: "Andrés", lastName: "Ferrer" },
+              player2: { name: "Martín", lastName: "Sosa" },
+              points: 3,
+              wins: 0,
+              losses: 2,
+              setsWon: 0,
+              setsLost: 4,
+            },
+          ],
+        },
+        {
+          id: "z2",
+          name: "Zona B",
+          matches: [
+            {
+              id: "z2m1",
+              pair1: {
+                id: "p3",
+                player1: { name: "Pedro", lastName: "Gómez" },
+                player2: { name: "Luis", lastName: "Martínez" },
+              },
+              pair2: {
+                id: "p5",
+                player1: { name: "Roberto", lastName: "González" },
+                player2: { name: "Miguel", lastName: "Torres" },
+              },
+              score: {
+                set1: { pair1: 6, pair2: 3 },
+                set2: { pair1: 3, pair2: 6 },
+                set3: { pair1: 7, pair2: 6 },
+              },
+              status: "finished",
+              date: "2025-11-15",
+              time: "11:30",
+              court: "Cancha 3",
+            },
+            {
+              id: "z2m2",
+              pair1: {
+                id: "p5",
+                player1: { name: "Roberto", lastName: "González" },
+                player2: { name: "Miguel", lastName: "Torres" },
+              },
+              pair2: {
+                id: "p91",
+                player1: { name: "Esteban", lastName: "Quito" },
+                player2: { name: "José", lastName: "Llamas" },
+              },
+              score: {
+                set1: { pair1: 6, pair2: 4 },
+                set2: { pair1: 6, pair2: 4 },
+              },
+              status: "finished",
+              date: "2025-11-15",
+              time: "15:30",
+              court: "Cancha 4",
+            },
+            {
+              id: "z2m3",
+              pair1: {
+                id: "p3",
+                player1: { name: "Pedro", lastName: "Gómez" },
+                player2: { name: "Luis", lastName: "Martínez" },
+              },
+              pair2: {
+                id: "p91",
+                player1: { name: "Esteban", lastName: "Quito" },
+                player2: { name: "José", lastName: "Llamas" },
+              },
+              score: {
+                set1: { pair1: 6, pair2: 2 },
+                set2: { pair1: 6, pair2: 2 },
+              },
+              status: "finished",
+              date: "2025-11-16",
+              time: "11:30",
+              court: "Cancha 2",
+            },
+          ],
+          pairs: [
+            {
+              id: "p3",
+              player1: { name: "Pedro", lastName: "Gómez" },
+              player2: { name: "Luis", lastName: "Martínez" },
+              points: 8,
+              wins: 2,
+              losses: 0,
+              setsWon: 4,
+              setsLost: 1,
+            },
+            {
+              id: "p5",
+              player1: { name: "Roberto", lastName: "González" },
+              player2: { name: "Miguel", lastName: "Torres" },
+              points: 6,
+              wins: 1,
+              losses: 1,
+              setsWon: 3,
+              setsLost: 2,
+            },
+            {
+              id: "p91",
+              player1: { name: "Esteban", lastName: "Quito" },
+              player2: { name: "José", lastName: "Llamas" },
+              points: 3,
+              wins: 0,
+              losses: 2,
+              setsWon: 0,
+              setsLost: 4,
+            },
+          ],
+        },
+        {
+          id: "z3",
+          name: "Zona C",
+          matches: [
+            {
+              id: "z3m1",
+              pair1: {
+                id: "p6",
+                player1: { name: "Pablo", lastName: "Díaz" },
+                player2: { name: "Nicolás", lastName: "Castro" },
+              },
+              pair2: {
+                id: "p12",
+                player1: { name: "Ricardo", lastName: "Silva" },
+                player2: { name: "Hugo", lastName: "Vázquez" },
+              },
+              score: {
+                set1: { pair1: 7, pair2: 5 },
+                set2: { pair1: 6, pair2: 2 },
+              },
+              status: "finished",
+              date: "2025-11-15",
+              time: "12:00",
+              court: "Cancha 1",
+            },
+            {
+              id: "z3m2",
+              pair1: {
+                id: "p12",
+                player1: { name: "Ricardo", lastName: "Silva" },
+                player2: { name: "Hugo", lastName: "Vázquez" },
+              },
+              pair2: {
+                id: "p92",
+                player1: { name: "Mario", lastName: "Rossi" },
+                player2: { name: "Franco", lastName: "Veron" },
+              },
+              score: {
+                set1: { pair1: 6, pair2: 3 },
+                set2: { pair1: 6, pair2: 3 },
+              },
+              status: "finished",
+              date: "2025-11-15",
+              time: "16:00",
+              court: "Cancha 2",
+            },
+            {
+              id: "z3m3",
+              pair1: {
+                id: "p6",
+                player1: { name: "Pablo", lastName: "Díaz" },
+                player2: { name: "Nicolás", lastName: "Castro" },
+              },
+              pair2: {
+                id: "p92",
+                player1: { name: "Mario", lastName: "Rossi" },
+                player2: { name: "Franco", lastName: "Veron" },
+              },
+              score: {
+                set1: { pair1: 6, pair2: 1 },
+                set2: { pair1: 6, pair2: 0 },
+              },
+              status: "finished",
+              date: "2025-11-16",
+              time: "12:00",
+              court: "Cancha 3",
+            },
+          ],
+          pairs: [
+            {
+              id: "p6",
+              player1: { name: "Pablo", lastName: "Díaz" },
+              player2: { name: "Nicolás", lastName: "Castro" },
+              points: 9,
+              wins: 2,
+              losses: 0,
+              setsWon: 4,
+              setsLost: 0,
+            },
+            {
+              id: "p12",
+              player1: { name: "Ricardo", lastName: "Silva" },
+              player2: { name: "Hugo", lastName: "Vázquez" },
+              points: 6,
+              wins: 1,
+              losses: 1,
+              setsWon: 2,
+              setsLost: 2,
+            },
+            {
+              id: "p92",
+              player1: { name: "Mario", lastName: "Rossi" },
+              player2: { name: "Franco", lastName: "Veron" },
+              points: 3,
+              wins: 0,
+              losses: 2,
+              setsWon: 0,
+              setsLost: 4,
+            },
+          ],
+        },
+        {
+          id: "z4",
+          name: "Zona D",
+          matches: [
+            {
+              id: "z4m1",
+              pair1: {
+                id: "p11",
+                player1: { name: "Fernando", lastName: "Ruiz" },
+                player2: { name: "Gabriel", lastName: "Alonso" },
+              },
+              pair2: {
+                id: "p10",
+                player1: { name: "Diego", lastName: "Fernández" },
+                player2: { name: "Javier", lastName: "Romero" },
+              },
+              score: {
+                set1: { pair1: 6, pair2: 4 },
+                set2: { pair1: 4, pair2: 6 },
+                set3: { pair1: 6, pair2: 3 },
+              },
+              status: "finished",
+              date: "2025-11-15",
+              time: "13:30",
+              court: "Cancha 3",
+            },
+            {
+              id: "z4m2",
+              pair1: {
+                id: "p10",
+                player1: { name: "Diego", lastName: "Fernández" },
+                player2: { name: "Javier", lastName: "Romero" },
+              },
+              pair2: {
+                id: "p93",
+                player1: { name: "Alejo", lastName: "Paz" },
+                player2: { name: "Bruno", lastName: "Díaz" },
+              },
+              score: {
+                set1: { pair1: 6, pair2: 2 },
+                set2: { pair1: 6, pair2: 2 },
+              },
+              status: "finished",
+              date: "2025-11-15",
+              time: "17:30",
+              court: "Cancha 4",
+            },
+            {
+              id: "z4m3",
+              pair1: {
+                id: "p11",
+                player1: { name: "Fernando", lastName: "Ruiz" },
+                player2: { name: "Gabriel", lastName: "Alonso" },
+              },
+              pair2: {
+                id: "p93",
+                player1: { name: "Alejo", lastName: "Paz" },
+                player2: { name: "Bruno", lastName: "Díaz" },
+              },
+              score: {
+                set1: { pair1: 6, pair2: 0 },
+                set2: { pair1: 6, pair2: 1 },
+              },
+              status: "finished",
+              date: "2025-11-16",
+              time: "13:30",
+              court: "Cancha 1",
+            },
+          ],
+          pairs: [
+            {
+              id: "p11",
+              player1: { name: "Fernando", lastName: "Ruiz" },
+              player2: { name: "Gabriel", lastName: "Alonso" },
+              points: 8,
+              wins: 2,
+              losses: 0,
+              setsWon: 4,
+              setsLost: 1,
+            },
+            {
+              id: "p10",
+              player1: { name: "Diego", lastName: "Fernández" },
+              player2: { name: "Javier", lastName: "Romero" },
+              points: 7,
+              wins: 1,
+              losses: 1,
+              setsWon: 3,
+              setsLost: 2,
+            },
+            {
+              id: "p93",
+              player1: { name: "Alejo", lastName: "Paz" },
+              player2: { name: "Bruno", lastName: "Díaz" },
+              points: 3,
+              wins: 0,
+              losses: 2,
+              setsWon: 0,
+              setsLost: 4,
+            },
+          ],
+        },
+      ],
+      champion: {
+        id: "p1",
+        player1: { name: "Juan", lastName: "Pérez" },
+        player2: { name: "Carlos", lastName: "López" },
+      },
+      semifinalists: [
+        {
+          id: "p3",
+          player1: { name: "Pedro", lastName: "Gómez" },
+          player2: { name: "Luis", lastName: "Martínez" },
+        },
+        {
+          id: "p10",
+          player1: { name: "Diego", lastName: "Fernández" },
+          player2: { name: "Javier", lastName: "Romero" },
+        },
+      ],
+      bracket: [
+        {
+          id: "round-qf",
+          name: "Cuartos de Final",
+          matches: [
+            {
+              id: "qf1",
+              pair1: {
+                id: "p1",
+                player1: { name: "Juan", lastName: "Pérez" },
+                player2: { name: "Carlos", lastName: "López" },
+              },
+              pair2: {
+                id: "p4",
+                player1: { name: "Lucas", lastName: "Morales" },
+                player2: { name: "Mateo", lastName: "Sánchez" },
+              },
+              score: {
+                set1: { pair1: 6, pair2: 3 },
+                set2: { pair1: 6, pair2: 4 },
+              },
+              winner: 1,
+              status: "finished",
+              date: "2025-11-20",
+              time: "14:00",
+              court: "Cancha 1",
+            },
+            {
+              id: "qf2",
+              pair1: {
+                id: "p3",
+                player1: { name: "Pedro", lastName: "Gómez" },
+                player2: { name: "Luis", lastName: "Martínez" },
+              },
+              pair2: {
+                id: "p5",
+                player1: { name: "Roberto", lastName: "González" },
+                player2: { name: "Miguel", lastName: "Torres" },
+              },
+              score: {
+                set1: { pair1: 4, pair2: 6 },
+                set2: { pair1: 6, pair2: 2 },
+                set3: { pair1: 6, pair2: 4 },
+              },
+              winner: 1,
+              status: "finished",
+              date: "2025-11-20",
+              time: "15:30",
+              court: "Cancha 2",
+            },
+            {
+              id: "qf3",
+              pair1: {
+                id: "p6",
+                player1: { name: "Pablo", lastName: "Díaz" },
+                player2: { name: "Nicolás", lastName: "Castro" },
+              },
+              pair2: {
+                id: "p10",
+                player1: { name: "Diego", lastName: "Fernández" },
+                player2: { name: "Javier", lastName: "Romero" },
+              },
+              status: "finished",
+              winner: 2,
+              score: {
+                set1: { pair1: 2, pair2: 6 },
+                set2: { pair1: 3, pair2: 6 },
+              },
+              date: "2025-11-20",
+              time: "14:00",
+              court: "Cancha 3",
+            },
+            {
+              id: "qf4",
+              pair1: {
+                id: "p11",
+                player1: { name: "Fernando", lastName: "Ruiz" },
+                player2: { name: "Gabriel", lastName: "Alonso" },
+              },
+              pair2: {
+                id: "p12",
+                player1: { name: "Ricardo", lastName: "Silva" },
+                player2: { name: "Hugo", lastName: "Vázquez" },
+              },
+              status: "finished",
+              winner: 1,
+              score: {
+                set1: { pair1: 7, pair2: 6 },
+                set2: { pair1: 6, pair2: 4 },
+              },
+              date: "2025-11-20",
+              time: "15:30",
+              court: "Cancha 4",
+            },
+          ],
+        },
+        {
+          id: "round-sf",
+          name: "Semifinales",
+          matches: [
+            {
+              id: "sf1",
+              pair1: {
+                id: "p1",
+                player1: { name: "Juan", lastName: "Pérez" },
+                player2: { name: "Carlos", lastName: "López" },
+              },
+              pair2: {
+                id: "p3",
+                player1: { name: "Pedro", lastName: "Gómez" },
+                player2: { name: "Luis", lastName: "Martínez" },
+              },
+              status: "finished",
+              winner: 1,
+              score: {
+                set1: { pair1: 6, pair2: 2 },
+                set2: { pair1: 6, pair2: 3 },
+              },
+              date: "2025-11-21",
+              time: "16:00",
+              court: "Central",
+            },
+            {
+              id: "sf2",
+              pair1: {
+                id: "p10",
+                player1: { name: "Diego", lastName: "Fernández" },
+                player2: { name: "Javier", lastName: "Romero" },
+              },
+              pair2: {
+                id: "p11",
+                player1: { name: "Fernando", lastName: "Ruiz" },
+                player2: { name: "Gabriel", lastName: "Alonso" },
+              },
+              status: "finished",
+              winner: 2,
+              score: {
+                set1: { pair1: 5, pair2: 7 },
+                set2: { pair1: 4, pair2: 6 },
+              },
+              date: "2025-11-21",
+              time: "17:30",
+              court: "Central",
+            },
+          ],
+        },
+        {
+          id: "round-f",
+          name: "Final",
+          matches: [
+            {
+              id: "f1",
+              pair1: {
+                id: "p1",
+                player1: { name: "Juan", lastName: "Pérez" },
+                player2: { name: "Carlos", lastName: "López" },
+              },
+              pair2: {
+                id: "p11",
+                player1: { name: "Fernando", lastName: "Ruiz" },
+                player2: { name: "Gabriel", lastName: "Alonso" },
+              },
+              status: "finished",
+              winner: 1,
+              score: {
+                set1: { pair1: 6, pair2: 4 },
+                set2: { pair1: 3, pair2: 6 },
+                set3: { pair1: 6, pair2: 4 },
+              },
+              date: "2025-11-22",
+              time: "18:00",
+              court: "Central",
+            },
+          ],
+        },
+      ],
+    },
+  ],
+};
+
 // Main Component
 export function TournamentDetailPage() {
   const { id: tournamentId } = useParams<{ id: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // TODO: Fetch tournament by ID from API
-  console.log("Tournament ID:", tournamentId);
-  const tournament = mockTournament;
+  // Select mock data based on ID (or default to en-curso)
+  // IDs 7 and 8 are finished tournaments in the list
+  const isFinished = tournamentId === "7" || tournamentId === "8";
+
+  let tournament = mockTournamentEnCurso;
+  if (isFinished) {
+    tournament = mockTournamentFinalizado;
+  } else if (tournamentId === "10") {
+    tournament = mockTournamentOctavos;
+  }
+
+  console.log(
+    "Details for Tournament ID:",
+    tournamentId,
+    "Using mock:",
+    isFinished ? "Finalizado" : "En Curso",
+  );
 
   // Get values from URL or use defaults
-  const activeTab = searchParams.get("tab") || "parejas";
+  const activeTab = searchParams.get("tab") || "llaves";
   const selectedCategory =
     searchParams.get("categoria") || tournament.categories[0] || "";
   const selectedGender =
@@ -1301,75 +2173,6 @@ export function TournamentDetailPage() {
               </Card>
             </div>
           )}
-
-          {/* Results Summary (for finished tournaments) */}
-          {tournament.status === "finalizado" &&
-            currentSubtournament?.champion && (
-              <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {/* Champion */}
-                <Card className="border-amber-500/30 bg-amber-500/10">
-                  <CardContent className="flex items-center gap-4 p-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/20">
-                      <Trophy className="h-6 w-6 text-amber-400" />
-                    </div>
-                    <div>
-                      <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
-                        Campeones
-                      </p>
-                      <p className="font-bold text-white">
-                        {currentSubtournament.champion.player1.lastName} /{" "}
-                        {currentSubtournament.champion.player2.lastName}
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Runner Up */}
-                {currentSubtournament.runnerUp && (
-                  <Card className="border-white/10 bg-slate-900/50">
-                    <CardContent className="flex items-center gap-4 p-4">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-800">
-                        <Award className="h-6 w-6 text-slate-400" />
-                      </div>
-                      <div>
-                        <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
-                          Subcampeones
-                        </p>
-                        <p className="font-bold text-white">
-                          {currentSubtournament.runnerUp.player1.lastName} /{" "}
-                          {currentSubtournament.runnerUp.player2.lastName}
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-
-                {/* Semifinalists */}
-                {currentSubtournament.semifinalists &&
-                  currentSubtournament.semifinalists.length > 0 && (
-                    <Card className="border-white/10 bg-slate-900/50 sm:col-span-2 lg:col-span-2">
-                      <CardContent className="flex items-center gap-4 p-4">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-800">
-                          <Medal className="h-6 w-6 text-slate-400" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
-                            Semifinalistas
-                          </p>
-                          <p className="font-bold text-white">
-                            {currentSubtournament.semifinalists
-                              .map(
-                                (pair) =>
-                                  `${pair.player1.lastName} / ${pair.player2.lastName}`,
-                              )
-                              .join(" • ")}
-                          </p>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )}
-              </div>
-            )}
         </div>
       </section>
 
@@ -1435,14 +2238,53 @@ export function TournamentDetailPage() {
               <Badge className="bg-blue-600/20 text-blue-400 border-blue-500/30 px-3 py-1.5">
                 {currentCategory} {genderLabels[currentGender]}
               </Badge>
-
-              {/* Cantidad de parejas en este subtorneo */}
-              <span className="text-sm text-slate-500">
-                {allPairs.length} parejas
-              </span>
             </div>
           </div>
         </div>
+
+        {/* Results Summary (MOVED HERE) */}
+        {tournament.status === "finalizado" &&
+          currentSubtournament?.champion && (
+            <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
+              {/* Champion */}
+              <Card className="border-amber-500/30 bg-amber-500/10">
+                <CardContent className="flex items-center gap-4 p-4">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/20">
+                    <Trophy className="h-6 w-6 text-amber-400" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+                      Campeones
+                    </p>
+                    <p className="font-bold text-white">
+                      {currentSubtournament.champion.player1.lastName} /{" "}
+                      {currentSubtournament.champion.player2.lastName}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Runner Up */}
+              {currentSubtournament.runnerUp && (
+                <Card className="border-white/10 bg-slate-900/50">
+                  <CardContent className="flex items-center gap-4 p-4">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-800">
+                      <Award className="h-6 w-6 text-slate-400" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+                        Subcampeones
+                      </p>
+                      <p className="font-bold text-white">
+                        {currentSubtournament.runnerUp.player1.lastName} /{" "}
+                        {currentSubtournament.runnerUp.player2.lastName}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          )}
 
         {/* Tabs del Subtorneo */}
         <Tabs
@@ -1512,19 +2354,19 @@ export function TournamentDetailPage() {
                   <CardContent>
                     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                       {allPairs.length > 0 ? (
-                        allPairs.map((pair) => (
+                        allPairs.map((pair, index) => (
                           <div
                             key={pair.id}
                             className="flex items-center gap-4 rounded-lg bg-slate-800/50 p-4"
                           >
                             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-500/20 text-sm font-bold text-blue-400">
-                              {pair.ranking || "-"}
+                              {index + 1}
                             </div>
-                            <div>
-                              <p className="font-semibold text-white">
+                            <div className="flex flex-col">
+                              <p className="font-medium text-white">
                                 {pair.player1.name} {pair.player1.lastName}
                               </p>
-                              <p className="text-sm text-slate-400">
+                              <p className="font-medium text-white">
                                 {pair.player2.name} {pair.player2.lastName}
                               </p>
                             </div>
@@ -1573,6 +2415,16 @@ export function TournamentDetailPage() {
 
               {/* Zones Tab */}
               <TabsContent value="zonas">
+                {/* Legend */}
+                <div className="mb-4 p-3 bg-slate-800/50 rounded-lg border border-white/10">
+                  <p className="text-xs text-slate-400">
+                    <span className="font-medium text-slate-300">
+                      Abreviaturas:
+                    </span>{" "}
+                    PJ = Partidos Jugados | G = Ganados | P = Perdidos | SG =
+                    Sets Ganados | SP = Sets Perdidos | Pts = Puntos
+                  </p>
+                </div>
                 <div className="grid gap-6 lg:grid-cols-2">
                   {currentSubtournament?.zones &&
                   currentSubtournament.zones.length > 0 ? (
@@ -1588,35 +2440,9 @@ export function TournamentDetailPage() {
               </TabsContent>
 
               {/* Bracket Tab */}
+              {/* Bracket Tab */}
               <TabsContent value="llaves">
-                {currentSubtournament?.bracket &&
-                currentSubtournament.bracket.length > 0 ? (
-                  <Card className="border-white/10 bg-slate-900/50">
-                    <CardHeader>
-                      <CardTitle className="text-white">
-                        Llave Eliminatoria - {currentCategory}{" "}
-                        {genderLabels[currentGender]}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                        {currentSubtournament.bracket.map((match) => (
-                          <MatchCard key={match.id} match={match} />
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ) : (
-                  <Card className="border-white/10 bg-slate-900/50">
-                    <CardContent className="py-12 text-center">
-                      <GitBranch className="mx-auto h-12 w-12 text-slate-600" />
-                      <p className="mt-4 text-slate-400">
-                        Las llaves eliminatorias estarán disponibles una vez
-                        finalizada la fase de grupos
-                      </p>
-                    </CardContent>
-                  </Card>
-                )}
+                <BracketView rounds={currentSubtournament?.bracket || []} />
               </TabsContent>
             </>
           )}

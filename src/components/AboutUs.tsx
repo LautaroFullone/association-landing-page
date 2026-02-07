@@ -42,7 +42,7 @@ export function AboutUs() {
   ];
 
   return (
-    <section id="about" className="py-32 bg-slate-900 relative scroll-mt-20">
+    <section id="about" className="py-24 bg-slate-900 relative scroll-mt-20">
       {/* Decorative gradient */}
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 

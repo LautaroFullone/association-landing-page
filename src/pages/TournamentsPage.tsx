@@ -64,6 +64,19 @@ interface Tournament {
 // Mock Data
 const mockTournaments: Tournament[] = [
   {
+    id: 10,
+    name: "Torneo Master 1000",
+    startDate: "2026-02-10",
+    endDate: "2026-02-20",
+    location: "Club Los Naranjos",
+    categories: ["1ra", "2da", "3ra"],
+    gender: ["masculino"],
+    status: "en-curso",
+    pairsCount: 32,
+    maxPairs: 32,
+    prize: "Trofeo Master",
+  },
+  {
     id: 1,
     name: "Torneo Apertura 2026",
     startDate: "2026-02-15",

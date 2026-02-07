@@ -21,8 +21,8 @@ export function LandingPage() {
       <Tournaments />
       <Merch />
       <Competition />
-      <Contact />
       <InstagramSection />
+      <Contact />
 
       <Footer />
     </div>

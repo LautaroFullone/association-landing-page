@@ -345,7 +345,7 @@ export function Tournaments() {
   return (
     <section
       id="tournaments"
-      className="py-32 bg-slate-950 relative scroll-mt-20 overflow-hidden"
+      className="py-24 bg-slate-950 relative scroll-mt-20 overflow-hidden"
     >
       {/* Background accents */}
       <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl opacity-20" />
