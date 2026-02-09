@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import {
   MapPin,
   Calendar,
@@ -79,7 +79,6 @@ export function Tournaments() {
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
 
   // MOCK DATA - Filtered for open tournaments mostly, but keeping structure
   const allTournaments: Tournament[] = [
@@ -94,7 +93,7 @@ export function Tournaments() {
       registrationDeadline: "2026-02-12",
       pairsCount: 32,
       status: "abierto",
-      price: 15000,
+      price: 60000,
       prize: "$150.000",
       lastSpots: true,
     },
@@ -109,7 +108,7 @@ export function Tournaments() {
       registrationDeadline: "2026-02-28",
       pairsCount: 24,
       status: "abierto",
-      price: 20000,
+      price: 55000,
       prize: "$300.000",
       lastSpots: false,
     },
@@ -124,7 +123,7 @@ export function Tournaments() {
       registrationDeadline: "2026-03-05",
       pairsCount: 16,
       status: "abierto",
-      price: 12000,
+      price: 30000,
       prize: "Indumentaria",
       lastSpots: true,
     },
@@ -139,7 +138,7 @@ export function Tournaments() {
       registrationDeadline: "2026-03-12",
       pairsCount: 20,
       status: "abierto",
-      price: 14000,
+      price: 40000,
       prize: "$100.000 + Trofeos",
       lastSpots: false,
     },
@@ -154,7 +153,7 @@ export function Tournaments() {
       registrationDeadline: "2026-03-15",
       pairsCount: 40,
       status: "abierto",
-      price: 18000,
+      price: 80000,
       prize: "Paletas + Indumentaria",
       lastSpots: false,
     },
@@ -169,7 +168,7 @@ export function Tournaments() {
       registrationDeadline: "2026-03-28",
       pairsCount: 64,
       status: "abierto",
-      price: 22000,
+      price: 70000,
       prize: "$400.000",
       lastSpots: true,
     },
@@ -184,7 +183,7 @@ export function Tournaments() {
       registrationDeadline: "2025-12-05",
       pairsCount: 16,
       status: "finalizado",
-      price: 0,
+      price: 50000,
       prize: "$500.000",
     },
   ];
@@ -296,19 +295,16 @@ export function Tournaments() {
     setIsDragging(true);
     setStartX(e.pageX - scrollContainerRef.current.offsetLeft);
     setScrollLeft(scrollContainerRef.current.scrollLeft);
-    setIsPaused(true);
   };
 
   const handleMouseLeave = () => {
     if (!isDragging) return;
     setIsDragging(false);
-    setIsPaused(false);
   };
 
   const handleMouseUp = () => {
     if (!isDragging) return;
     setIsDragging(false);
-    setIsPaused(false);
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -318,28 +314,6 @@ export function Tournaments() {
     const walk = (x - startX) * 2; // Scroll speed multiplier
     scrollContainerRef.current.scrollLeft = scrollLeft - walk;
   };
-
-  // Auto-play
-  useEffect(() => {
-    if (activeTournaments.length <= 1 || isPaused) return;
-
-    const interval = setInterval(() => {
-      if (scrollContainerRef.current) {
-        const container = scrollContainerRef.current;
-        const maxScroll = container.scrollWidth - container.clientWidth;
-
-        // If we reached the end, go back to start, otherwise scroll right
-        if (container.scrollLeft >= maxScroll - 10) {
-          // tolerance
-          container.scrollTo({ left: 0, behavior: "smooth" });
-        } else {
-          scroll("right");
-        }
-      }
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [activeTournaments.length, isPaused]);
 
   return (
     <section
@@ -403,11 +377,7 @@ export function Tournaments() {
           </div>
         ) : (
           /* Scroll Container */
-          <div
-            className="relative group/carousel -mx-4 px-4 sm:mx-0 sm:px-0"
-            onMouseEnter={() => setIsPaused(true)}
-            onMouseLeave={() => setIsPaused(false)}
-          >
+          <div className="relative group/carousel -mx-4 px-4 sm:mx-0 sm:px-0">
             <div
               ref={scrollContainerRef}
               className={cn(
