@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
 export function ScrollToAnchor() {
-  const { pathname, hash, key } = useLocation();
+  const { pathname, hash } = useLocation();
 
   useEffect(() => {
     if (hash) {
@@ -23,7 +23,7 @@ export function ScrollToAnchor() {
     } else {
       window.scrollTo(0, 0);
     }
-  }, [pathname, hash, key]);
+  }, [pathname, hash]);
 
   return null;
 }

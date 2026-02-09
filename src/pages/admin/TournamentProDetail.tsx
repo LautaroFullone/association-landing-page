@@ -48,6 +48,7 @@ import type {
   MatchStatus,
 } from "@/model/TournamentPro.model";
 import { Button } from "@/components/ui/button";
+import { BracketView } from "@/components/bracket/BracketView";
 
 // Enrolled pair interface (for management)
 interface EnrolledPair {
@@ -1289,128 +1290,68 @@ export function TournamentProDetail() {
         {/* Llaves Tab */}
         <TabsContent value="llaves">
           {tournament.bracket && tournament.bracket.length > 0 ? (
-            <div className="bg-slate-900 border border-white/5 rounded-xl p-6">
-              <h3 className="text-lg font-bold text-white mb-6">
-                Llave Eliminatoria
-              </h3>
-              <div className="space-y-4">
-                {/* Group by round */}
-                {Array.from(new Set(tournament.bracket.map((m) => m.round)))
+            <div className="bg-slate-900 border border-white/5 rounded-xl p-6 overflow-x-auto">
+              <BracketView
+                layers={Array.from(
+                  new Set(tournament.bracket.map((m) => m.round)),
+                )
                   .sort((a, b) => a - b)
                   .map((round) => {
-                    const roundMatches = tournament.bracket!.filter(
+                    const matches = tournament.bracket!.filter(
                       (m) => m.round === round,
                     );
-                    const roundName =
+                    const name =
                       round === 1
                         ? "Cuartos de Final"
                         : round === 2
                           ? "Semifinales"
                           : "Final";
 
-                    return (
-                      <div key={round}>
-                        <h4 className="text-sm font-semibold text-yellow-400 uppercase tracking-wider mb-3">
-                          {roundName}
-                        </h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {roundMatches.map((match) => (
-                            <div
-                              key={match.id}
-                              className="bg-slate-800/50 border border-white/5 rounded-xl p-4"
-                            >
-                              <div className="flex items-center justify-between mb-3">
-                                <span
-                                  className={`text-xs font-medium px-2 py-1 rounded ${
-                                    match.status === "finalizado"
-                                      ? "bg-slate-700 text-slate-300"
-                                      : match.status === "en-juego"
-                                        ? "bg-red-500/10 text-red-400"
-                                        : "bg-blue-500/10 text-blue-400"
-                                  }`}
-                                >
-                                  {match.status === "finalizado"
-                                    ? "Finalizado"
-                                    : match.status === "en-juego"
-                                      ? "En Juego"
-                                      : "Pendiente"}
-                                </span>
-                              </div>
-                              <div className="space-y-2">
-                                <div
-                                  className={`flex items-center justify-between p-2 rounded ${
-                                    match.winner?.id === match.pair1?.id
-                                      ? "bg-green-500/10 border border-green-500/20"
-                                      : ""
-                                  }`}
-                                >
-                                  <span
-                                    className={`font-medium ${
-                                      match.winner?.id === match.pair1?.id
-                                        ? "text-green-400"
-                                        : "text-white"
-                                    }`}
-                                  >
-                                    {match.pair1
-                                      ? `${match.pair1.player1.lastName} / ${match.pair1.player2.lastName}`
-                                      : "Por definir"}
-                                  </span>
-                                  <div className="flex gap-1">
-                                    {match.score1?.map((set, i) => (
-                                      <span
-                                        key={i}
-                                        className={`w-6 h-6 flex items-center justify-center rounded text-sm font-bold ${
-                                          set > (match.score2?.[i] ?? 0)
-                                            ? "bg-green-500/20 text-green-400"
-                                            : "bg-slate-700 text-slate-300"
-                                        }`}
-                                      >
-                                        {set}
-                                      </span>
-                                    ))}
-                                  </div>
-                                </div>
-                                <div
-                                  className={`flex items-center justify-between p-2 rounded ${
-                                    match.winner?.id === match.pair2?.id
-                                      ? "bg-green-500/10 border border-green-500/20"
-                                      : ""
-                                  }`}
-                                >
-                                  <span
-                                    className={`font-medium ${
-                                      match.winner?.id === match.pair2?.id
-                                        ? "text-green-400"
-                                        : "text-white"
-                                    }`}
-                                  >
-                                    {match.pair2
-                                      ? `${match.pair2.player1.lastName} / ${match.pair2.player2.lastName}`
-                                      : "Por definir"}
-                                  </span>
-                                  <div className="flex gap-1">
-                                    {match.score2?.map((set, i) => (
-                                      <span
-                                        key={i}
-                                        className={`w-6 h-6 flex items-center justify-center rounded text-sm font-bold ${
-                                          set > (match.score1?.[i] ?? 0)
-                                            ? "bg-green-500/20 text-green-400"
-                                            : "bg-slate-700 text-slate-300"
-                                        }`}
-                                      >
-                                        {set}
-                                      </span>
-                                    ))}
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    );
+                    return {
+                      name,
+                      matches: matches.map((m) => ({
+                        id: m.id,
+                        pair1: m.pair1
+                          ? {
+                              player1: {
+                                name: m.pair1.player1.name,
+                                lastName: m.pair1.player1.lastName,
+                              },
+                              player2: {
+                                name: m.pair1.player2.name,
+                                lastName: m.pair1.player2.lastName,
+                              },
+                            }
+                          : null,
+                        pair2: m.pair2
+                          ? {
+                              player1: {
+                                name: m.pair2.player1.name,
+                                lastName: m.pair2.player1.lastName,
+                              },
+                              player2: {
+                                name: m.pair2.player2.name,
+                                lastName: m.pair2.player2.lastName,
+                              },
+                            }
+                          : null,
+                        score1: m.score1,
+                        score2: m.score2,
+                        winner: m.winner
+                          ? m.winner.id === m.pair1?.id
+                            ? 1
+                            : 2
+                          : null,
+                        status:
+                          m.status === "finalizado"
+                            ? "finished"
+                            : m.status === "en-juego"
+                              ? "en-juego"
+                              : "pending",
+                      })),
+                    };
                   })}
-              </div>
+              />
             </div>
           ) : (
             <div className="bg-slate-900 border border-white/5 rounded-xl p-12 text-center">

@@ -74,7 +74,7 @@ const mockTournaments: Tournament[] = [
     status: "en-curso",
     pairsCount: 32,
     maxPairs: 32,
-    prize: "Trofeo Master",
+    prize: "$200.000 + Remera Oficial",
   },
   {
     id: 1,
