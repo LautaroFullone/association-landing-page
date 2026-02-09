@@ -20,10 +20,7 @@ import {
   MapPin,
   Users,
   Trophy,
-  Zap,
   Grid3X3,
-  Award,
-  Medal,
   ArrowUp,
   Minus,
   Swords,
@@ -367,133 +364,72 @@ export function TournamentProDetail() {
 
   return (
     <div className="animate-in fade-in duration-500">
-      {/* Header */}
       <div className="mb-6">
         <Link
-          to="/admin/tournaments-pro"
+          to="/admin/tournaments"
           className="inline-flex items-center text-sm text-slate-400 hover:text-white transition-colors mb-4 gap-1 group"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          Volver a Torneos PRO
+          Volver a Torneos
         </Link>
-
-        {/* Tournament Header Card */}
-        <div className="p-6 rounded-2xl bg-gradient-to-r from-yellow-500/10 via-orange-500/10 to-yellow-500/10 border border-yellow-500/20 mb-6">
-          <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6">
-            <div className="flex items-start gap-4">
-              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-yellow-500/20 to-orange-500/20 flex items-center justify-center shrink-0">
-                <Zap className="w-7 h-7 text-yellow-400" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2 mb-2">
-                  <span
-                    className={`px-2 py-0.5 rounded text-xs font-semibold border ${status.className}`}
-                  >
-                    {status.label}
-                  </span>
-                  <span className="text-sm font-bold bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded border border-yellow-500/30">
-                    PRO
-                  </span>
-                </div>
-                <h1 className="text-3xl font-bold text-white mb-2">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <h1 className="text-3xl font-bold text-white mb-1">
                   {tournament.name}
                 </h1>
-                <div className="flex flex-wrap items-center gap-4 text-sm text-slate-400">
-                  <span className="flex items-center gap-1">
-                    <Calendar className="w-4 h-4 text-yellow-500" />
-                    {new Date(tournament.startDate).toLocaleDateString(
-                      "es-AR",
-                      { day: "numeric", month: "long" },
-                    )}{" "}
-                    -{" "}
-                    {new Date(tournament.endDate).toLocaleDateString("es-AR", {
-                      day: "numeric",
-                      month: "long",
-                    })}
-                  </span>
-                  {tournament.location && (
-                    <span className="flex items-center gap-1">
-                      <MapPin className="w-4 h-4 text-yellow-500" />
-                      {tournament.location}
-                    </span>
-                  )}
-                  <span className="flex items-center gap-1">
-                    <Users className="w-4 h-4 text-yellow-500" />
-                    {tournament.pairsCount} parejas
-                  </span>
-                  {tournament.prize && (
-                    <span className="flex items-center gap-1">
-                      <Trophy className="w-4 h-4 text-yellow-500" />
-                      {tournament.prize}
-                    </span>
-                  )}
-                </div>
+                <span
+                  className={`px-2 py-0.5 rounded text-xs font-semibold border ${status.className}`}
+                >
+                  {status.label}
+                </span>
               </div>
             </div>
-
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setIsNewPairModalOpen(true)}
-                className="flex items-center gap-2 bg-yellow-500 hover:bg-yellow-400 text-black px-4 py-2 rounded-lg font-semibold transition-colors shadow-lg shadow-yellow-500/20 cursor-pointer"
-              >
-                <UserPlus className="w-4 h-4" />
-                Agregar Pareja
-              </button>
-              <button className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg font-medium transition-colors border border-white/5 cursor-pointer">
-                <Download className="w-4 h-4" />
-                Exportar
-              </button>
+            <div className="flex flex-wrap items-center gap-4 text-base text-slate-400">
+              <span className="flex items-center gap-1">
+                <Calendar className="w-4 h-4 text-yellow-500" />
+                {new Date(tournament.startDate).toLocaleDateString("es-AR", {
+                  day: "numeric",
+                  month: "long",
+                })}{" "}
+                -{" "}
+                {new Date(tournament.endDate).toLocaleDateString("es-AR", {
+                  day: "numeric",
+                  month: "long",
+                })}
+              </span>
+              {tournament.location && (
+                <span className="flex items-center gap-1">
+                  <MapPin className="w-4 h-4 text-yellow-500" />
+                  {tournament.location}
+                </span>
+              )}
+              <span className="flex items-center gap-1">
+                <Users className="w-4 h-4 text-yellow-500" />
+                {tournament.pairsCount} parejas
+              </span>
+              {tournament.prize && (
+                <span className="flex items-center gap-1">
+                  <Trophy className="w-4 h-4 text-yellow-500" />
+                  {tournament.prize}
+                </span>
+              )}
             </div>
           </div>
-
-          {/* Results Summary (for finished tournaments) */}
-          {tournament.status === "finalizado" && tournament.champion && (
-            <div className="mt-6 pt-6 border-t border-yellow-500/20 grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-yellow-500/10">
-                <Trophy className="w-8 h-8 text-yellow-400" />
-                <div>
-                  <p className="text-xs text-slate-400 uppercase">Campeones</p>
-                  <p className="text-white font-bold">
-                    {tournament.champion.player1.lastName} /{" "}
-                    {tournament.champion.player2.lastName}
-                  </p>
-                </div>
-              </div>
-              {tournament.runnerUp && (
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-800/50">
-                  <Award className="w-8 h-8 text-slate-400" />
-                  <div>
-                    <p className="text-xs text-slate-400 uppercase">
-                      Subcampeones
-                    </p>
-                    <p className="text-white font-bold">
-                      {tournament.runnerUp.player1.lastName} /{" "}
-                      {tournament.runnerUp.player2.lastName}
-                    </p>
-                  </div>
-                </div>
-              )}
-              {tournament.semifinalists &&
-                tournament.semifinalists.length > 0 && (
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-800/50">
-                    <Medal className="w-8 h-8 text-slate-400" />
-                    <div>
-                      <p className="text-xs text-slate-400 uppercase">
-                        Semifinalistas
-                      </p>
-                      <p className="text-white font-bold text-sm">
-                        {tournament.semifinalists
-                          .map(
-                            (pair) =>
-                              `${pair.player1.lastName}/${pair.player2.lastName}`,
-                          )
-                          .join(" • ")}
-                      </p>
-                    </div>
-                  </div>
-                )}
-            </div>
-          )}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIsNewPairModalOpen(true)}
+              className="flex items-center gap-2 bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-lg shadow-green-600/20 cursor-pointer"
+            >
+              <UserPlus className="w-4 h-4" />
+              Agregar Pareja
+            </button>
+            <button className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg font-medium transition-colors border border-white/5 cursor-pointer">
+              <Download className="w-4 h-4" />
+              Exportar
+            </button>
+          </div>
         </div>
       </div>
 
@@ -879,10 +815,10 @@ export function TournamentProDetail() {
                             }
                           >
                             <SelectTrigger
-                              className={`w-[120px] border-0 h-8 text-xs font-medium ${
+                              className={`w-[140px] border-0 h-8 text-xs font-medium ${
                                 pair.paymentStatus === "paid"
-                                  ? "bg-green-500/10 text-green-400"
-                                  : "bg-yellow-500/10 text-yellow-400"
+                                  ? "bg-green-500/10 text-green-400 focus:ring-green-500/50"
+                                  : "bg-yellow-500/10 text-yellow-400 focus:ring-yellow-500/50"
                               }`}
                             >
                               <SelectValue />
@@ -893,7 +829,7 @@ export function TournamentProDetail() {
                                 className="text-green-400 focus:bg-green-500/10 focus:text-green-400"
                               >
                                 <div className="flex items-center gap-2">
-                                  <CheckCircle className="w-3 h-3" />
+                                  <CheckCircle className="w-3 h-3 text-current" />
                                   <span>Pagado</span>
                                 </div>
                               </SelectItem>
@@ -902,7 +838,7 @@ export function TournamentProDetail() {
                                 className="text-yellow-400 focus:bg-yellow-500/10 focus:text-yellow-400"
                               >
                                 <div className="flex items-center gap-2">
-                                  <CreditCard className="w-3 h-3" />
+                                  <CreditCard className="w-3 h-3 text-current" />
                                   <span>Pendiente</span>
                                 </div>
                               </SelectItem>
@@ -1510,7 +1446,7 @@ export function TournamentProDetail() {
                     Agregar Pareja
                   </h2>
                   <p className="text-slate-400 text-sm">
-                    Registra una pareja al torneo PRO
+                    Registra una pareja al torneo
                   </p>
                 </div>
               </div>

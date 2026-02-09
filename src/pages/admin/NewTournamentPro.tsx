@@ -5,7 +5,6 @@ import {
   Trophy,
   MapPin,
   Users,
-  Zap,
   Loader2,
   Calendar,
   DollarSign,
@@ -141,44 +140,6 @@ export function NewTournamentPro() {
 
   return (
     <div className="animate-in fade-in duration-500">
-      {/* PRO Features Info */}
-      <div className="bg-gradient-to-r from-yellow-500/10 via-orange-500/10 to-yellow-500/10 border border-yellow-500/20 rounded-2xl p-6 mb-8">
-        <div className="flex items-start gap-4">
-          <div className="w-12 h-12 rounded-xl bg-yellow-500/20 flex items-center justify-center shrink-0">
-            <Zap className="w-6 h-6 text-yellow-400" />
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-              Funcionalidades PRO
-              <span className="text-xs font-bold bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded">
-                INCLUIDAS
-              </span>
-            </h3>
-            <p className="text-sm text-slate-400 mt-2">
-              Al crear este torneo tendrás acceso a:
-            </p>
-            <ul className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-              <li className="flex items-center gap-2 text-slate-300">
-                <div className="w-1.5 h-1.5 rounded-full bg-yellow-400" />
-                Gestión de zonas y fases de grupos
-              </li>
-              <li className="flex items-center gap-2 text-slate-300">
-                <div className="w-1.5 h-1.5 rounded-full bg-yellow-400" />
-                Sistema de llaves dinámico
-              </li>
-              <li className="flex items-center gap-2 text-slate-300">
-                <div className="w-1.5 h-1.5 rounded-full bg-yellow-400" />
-                Resultados en tiempo real
-              </li>
-              <li className="flex items-center gap-2 text-slate-300">
-                <div className="w-1.5 h-1.5 rounded-full bg-yellow-400" />
-                Ranking integrado automático
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div className="flex items-center gap-4">
@@ -193,9 +154,6 @@ export function NewTournamentPro() {
               <h1 className="text-2xl md:text-3xl font-bold text-white">
                 Nuevo Torneo
               </h1>
-              <span className="text-sm font-bold bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded border border-yellow-500/30">
-                PRO
-              </span>
             </div>
             <p className="text-slate-400 mt-1">
               Completa los datos para crear un nuevo torneo
@@ -470,7 +428,7 @@ export function NewTournamentPro() {
             ) : (
               <>
                 <Save className="w-5 h-5" />
-                Crear Torneo PRO
+                Crear Torneo
               </>
             )}
           </button>

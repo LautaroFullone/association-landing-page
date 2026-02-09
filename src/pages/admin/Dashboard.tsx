@@ -9,9 +9,33 @@ import {
   Calendar,
   CheckCircle,
   AlertCircle,
+  DollarSign,
+  Save,
 } from "lucide-react";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export function Dashboard() {
+  const [subscriptionCost, setSubscriptionCost] = useState("15000");
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSaveCost = () => {
+    setIsSaving(true);
+    // Simulate API call
+    setTimeout(() => {
+      setIsSaving(false);
+    }, 1000);
+  };
+
   const stats = [
     {
       name: "Solicitudes Pendientes",
@@ -193,37 +217,93 @@ export function Dashboard() {
           </div>
         </div>
 
-        {/* Quick Actions */}
-        <div className="bg-slate-800/50 backdrop-blur-sm p-5 md:p-6 rounded-2xl border border-white/5">
-          <div className="flex items-center gap-2 mb-6">
-            <ChevronRight className="w-5 h-5 text-purple-400" />
-            <h3 className="text-lg font-bold text-white">Acciones Rápidas</h3>
-          </div>
-          <p className="text-slate-500 text-sm -mt-4 mb-6">Tareas frecuentes</p>
-
-          <div className="space-y-3">
-            {quickActions.map((action) => (
-              <a
-                key={action.id}
-                href={action.href}
-                className="flex items-center gap-4 p-3 rounded-xl bg-slate-900/50 hover:bg-slate-900 transition-colors group cursor-pointer"
-              >
-                <div
-                  className={`p-2 rounded-lg ${action.iconBg} ${action.iconColor} shrink-0`}
+        {/* Quick Actions & Configuration */}
+        <div className="space-y-6 md:space-y-8">
+          {/* Subscription Cost Configuration */}
+          <Card className="bg-slate-800/50 backdrop-blur-sm border-white/5">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <DollarSign className="w-5 h-5 text-green-400" />
+                <CardTitle className="text-white">
+                  Costo de Suscripción
+                </CardTitle>
+              </div>
+              <CardDescription className="text-slate-400">
+                Define el valor de la cuota social mensual.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-end gap-4">
+                <div className="grid w-full items-center gap-1.5">
+                  <Label htmlFor="cost" className="text-slate-300">
+                    Monto actual
+                  </Label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                      $
+                    </span>
+                    <Input
+                      id="cost"
+                      type="number"
+                      value={subscriptionCost}
+                      onChange={(e) => setSubscriptionCost(e.target.value)}
+                      className="pl-7 bg-slate-900/50 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-blue-500/50"
+                      placeholder="0.00"
+                    />
+                  </div>
+                </div>
+                <Button
+                  onClick={handleSaveCost}
+                  disabled={isSaving}
+                  className="bg-blue-600 hover:bg-blue-700 min-w-[100px]"
                 >
-                  <action.icon className="w-4 h-4" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-white">
-                    {action.title}
-                  </p>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    {action.subtitle}
-                  </p>
-                </div>
-                <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-slate-400 group-hover:translate-x-0.5 transition-all shrink-0" />
-              </a>
-            ))}
+                  {isSaving ? (
+                    "Guardando..."
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4 mr-2" />
+                      Guardar
+                    </>
+                  )}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Quick Actions */}
+          <div className="bg-slate-800/50 backdrop-blur-sm p-5 md:p-6 rounded-2xl border border-white/5">
+            <div className="flex items-center gap-2 mb-6">
+              <ChevronRight className="w-5 h-5 text-purple-400" />
+              <h3 className="text-lg font-bold text-white">Acciones Rápidas</h3>
+            </div>
+            <p className="text-slate-500 text-sm -mt-4 mb-6">
+              Tareas frecuentes
+            </p>
+
+            <div className="space-y-3">
+              {quickActions.map((action) => (
+                <a
+                  key={action.id}
+                  href={action.href}
+                  className="flex items-center gap-4 p-3 rounded-xl bg-slate-900/50 hover:bg-slate-900 transition-colors group cursor-pointer"
+                >
+                  <div
+                    className={`p-2 rounded-lg ${action.iconBg} ${action.iconColor} shrink-0`}
+                  >
+                    <action.icon className="w-4 h-4" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-white">
+                      {action.title}
+                    </p>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      {action.subtitle}
+                    </p>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-slate-400 group-hover:translate-x-0.5 transition-all shrink-0" />
+                </a>
+              ))}
+            </div>
           </div>
         </div>
       </div>

@@ -68,22 +68,22 @@ export function AdminLayout() {
       icon: Users,
       path: "/admin/requests",
     },
-    {
-      name: "Torneos",
-      icon: Trophy,
-      path: "/admin/tournaments",
-    },
+    //  {
+    //    name: "Torneos",
+    //    icon: Trophy,
+    //    path: "/admin/tournaments",
+    //  },
     {
       name: "Torneos",
       icon: Trophy,
       path: "/admin/tournaments-pro",
-      isPro: true,
+      isPro: false,
     },
     {
       name: "Ranking",
       icon: Medal,
       path: "/admin/ranking",
-      isPro: true,
+      isPro: false,
     },
   ];
 

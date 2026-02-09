@@ -117,130 +117,7 @@ export function TournamentsProList() {
           Nuevo Torneo
         </Link>
       </div>
-      {/* PRO Header */}
-      {/* <div className="mb-8 p-6 rounded-2xl bg-gradient-to-r from-yellow-500/10 via-orange-500/10 to-yellow-500/10 border border-yellow-500/20">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-yellow-500/20 to-orange-500/20 flex items-center justify-center">
-              <Zap className="w-7 h-7 text-yellow-400" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-3xl font-bold text-white">Torneos</h1>
-                <span className="text-sm font-bold bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded border border-yellow-500/30">
-                  PRO
-                </span>
-              </div>
-              <p className="text-slate-400 mt-1">
-                Gestión avanzada de torneos con zonas, parejas inscriptas y
-                resultados en vivo
-              </p>
-            </div>
-          </div>
-          <Link
-            to="/admin/tournaments-pro/new"
-            className="flex items-center gap-2 bg-yellow-500 hover:bg-yellow-400 text-black px-4 py-2 rounded-lg font-semibold transition-colors shadow-lg shadow-yellow-500/20"
-          >
-            <Plus className="w-5 h-5" />
-            Nuevo Torneo PRO
-          </Link>
-        </div>
-      </div> */}
 
-      {/* PRO Features Grid */}
-      {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {proFeatures.map((feature, index) => (
-          <div
-            key={index}
-            className="p-4 rounded-xl bg-slate-800/30 border border-white/5 hover:border-yellow-500/20 transition-all group"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-yellow-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <feature.icon className="w-5 h-5 text-yellow-400" />
-              </div>
-              <div>
-                <h3 className="text-sm font-semibold text-white">
-                  {feature.title}
-                </h3>
-                <p className="text-xs text-slate-400">{feature.description}</p>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div> */}
-
-      {/* Live Matches Section */}
-      {/* {liveMatches.length > 0 && (
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <span className="relative flex h-3 w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-            </span>
-            <h2 className="text-xl font-bold text-white">Partidos En Vivo</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {liveMatches.map((match) => (
-              <div
-                key={match.id}
-                className="p-4 rounded-xl bg-slate-800/50 border border-red-500/20 hover:border-red-500/40 transition-all"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs font-medium text-red-400 bg-red-500/10 px-2 py-1 rounded">
-                    {match.zone}
-                  </span>
-                  <span className="text-xs text-slate-400">
-                    {match.court} • {match.time}
-                  </span>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-white font-medium">
-                      {match.pair1.player1.lastName} /{" "}
-                      {match.pair1.player2.lastName}
-                    </span>
-                    <div className="flex gap-1">
-                      {match.score1?.map((set, i) => (
-                        <span
-                          key={i}
-                          className={`w-6 h-6 flex items-center justify-center rounded text-sm font-bold ${
-                            set > (match.score2?.[i] ?? 0)
-                              ? "bg-green-500/20 text-green-400"
-                              : "bg-slate-700 text-slate-300"
-                          }`}
-                        >
-                          {set}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-white font-medium">
-                      {match.pair2.player1.lastName} /{" "}
-                      {match.pair2.player2.lastName}
-                    </span>
-                    <div className="flex gap-1">
-                      {match.score2?.map((set, i) => (
-                        <span
-                          key={i}
-                          className={`w-6 h-6 flex items-center justify-center rounded text-sm font-bold ${
-                            set > (match.score1?.[i] ?? 0)
-                              ? "bg-green-500/20 text-green-400"
-                              : "bg-slate-700 text-slate-300"
-                          }`}
-                        >
-                          {set}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )} */}
-      {/* <Separator className="mb-8" /> */}
       {/* Stats Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <div className="p-4 rounded-xl bg-slate-800/50 border border-white/5">
@@ -272,13 +149,13 @@ export function TournamentsProList() {
         <div className="p-4 rounded-xl bg-slate-800/50 border border-white/5">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
-              <Users className="w-5 h-5 text-purple-400" />
+              <Trophy className="w-5 h-5 text-purple-400" />
             </div>
             <div>
               <p className="text-2xl font-bold text-white">
-                {tournaments.reduce((acc, t) => acc + t.pairsCount, 0)}
+                {tournaments.length}
               </p>
-              <p className="text-sm text-slate-400">Parejas Totales</p>
+              <p className="text-sm text-slate-400">Totales</p>
             </div>
           </div>
         </div>
@@ -446,7 +323,7 @@ export function TournamentsProList() {
             <p className="text-sm text-slate-400">
               {searchQuery || statusFilter !== "all"
                 ? "No se encontraron torneos con esos filtros"
-                : "Crea tu primer torneo PRO para empezar"}
+                : "Crea tu primer torneo para empezar"}
             </p>
           </div>
         )}

@@ -91,7 +91,7 @@ export function TournamentCreate() {
 
     console.log("Tournament data:", formData);
     setIsSubmitting(false);
-    navigate("/admin/tournaments");
+    navigate("/admin/tournaments-pro");
   };
 
   return (
